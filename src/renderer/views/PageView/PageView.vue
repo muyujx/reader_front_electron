@@ -295,6 +295,19 @@ const pageConfirm = ref(false);
 const pageConfirmRemote = ref(0);
 const pageConfirmLocal = ref(0);
 
+let updateInterval = -1;
+
+onBeforeUnmount(() => {
+    console.log("-------- onBeforeUnmount page -----");
+    if (updateInterval == -1) {
+        return;
+    }
+    clearInterval(updateInterval);
+    // 推出前更新当前页
+    updateRemotePage(bookId, curPageItem.value.page);
+});
+
+
 async function initPage(bookId: number) {
     let localPage = getLocalStorageInt(bookId, PageCache.COVER_PAGE);
     // 获取服务端书页进度
@@ -310,18 +323,15 @@ async function initPage(bookId: number) {
     // 存在远程进度, 还是先获取本地进度书页
     getPageHtml(resPage);
 
-    const intervalId = setInterval(() => {
+    updateInterval = setInterval(() => {
+        console.log(`---------- remote update bookId = ${bookId} ---------`);
+
         if (resPage != curPageItem.value.page) {
             resPage = curPageItem.value.page;
             updateRemotePage(bookId, resPage);
         }
     }, 5 * 1000);
 
-    onBeforeUnmount(() => {
-        clearInterval(intervalId);
-        // 推出前更新当前页
-        updateRemotePage(bookId, curPageItem.value.page);
-    });
 
     if (remotePage != localPage) {
         // 服务端进度和本地进度不一致, 手动确认要保留的进度
