@@ -6,7 +6,8 @@ export interface FavoriteBookInfo {
     coverPic: string,
     tagId: number,
     page: number,
-    lastRead: number
+    lastRead: number,
+    readingCost: number,
 }
 
 export interface FavoriteBookList {

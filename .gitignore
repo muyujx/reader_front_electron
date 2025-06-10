@@ -1,11 +1,9 @@
 node_modules
 .DS_Store
 dist
-web/proxyConfig.js
 dist.*
 .idea
 .vscode
-config
 docker
 deploy.ps1
 yarn.lock

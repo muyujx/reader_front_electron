@@ -86,7 +86,6 @@ getContents(props.bookId).then((contentList: ContentsItem[]) => {
     contents.value = contentList;
 });
 
-
 /**
  * 开关目录
  */

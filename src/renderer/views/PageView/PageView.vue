@@ -130,6 +130,7 @@ import ViewFooterBar from "../../components/ViewFooterBar.vue";
 import Config from "../Config/Config.vue";
 import {getRemotePage, updateRemotePage} from "../../apis/userRemotePage";
 import {addHost} from "../../apis/request.ts";
+import {recordReadingTime} from "./pageView.ts";
 
 // 是否显示底部时间
 const showClock = ref(false);
@@ -186,6 +187,10 @@ if (bookIdStr == null || isNaN(parseInt(bookIdStr))) {
     );
 }
 bookId = parseInt(bookIdStr);
+
+// 记录阅读时间
+recordReadingTime(bookId);
+
 
 // 页面缓存
 const pageCache = new PageCache(bookId);

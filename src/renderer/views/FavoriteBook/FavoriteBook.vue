@@ -48,11 +48,6 @@
                     <p class="name">{{ book.bookName }}</p>
 
                     <div class="item">
-                        <p>类型:</p>
-                        <p>{{ tagMap.get(book.tagId)?.name }}</p>
-                    </div>
-
-                    <div class="item">
                         <p>上次读到:</p>
                         <p>{{ book.lastRead == 0 ? 0 : book.page }}页</p>
                     </div>
@@ -65,6 +60,11 @@
                     <div class="item">
                         <p>进度:</p>
                         <p>{{ book.lastRead == 0 ? 0 : (book.page / book.totalPage * 100).toFixed(2) }}%</p>
+                    </div>
+
+                    <div class="item">
+                        <p>阅读时间:</p>
+                        <p>{{ Math.floor(book.readingCost / 60) }} 分钟</p>
                     </div>
 
                     <div class="item">
