@@ -9,7 +9,7 @@ export function recordReadingTime(bookId: number) {
     const start = Date.now() / 1000;
 
     // 小于 60 秒不记录
-    const minTime = 0;
+    const minTime = 60;
 
     onBeforeUnmount(() => {
         const cost = Math.floor(Date.now() / 1000 - start);

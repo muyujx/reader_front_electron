@@ -118,7 +118,6 @@ const tagMap = new Map<number, BookTag>;
 const tags = ref<BookTag[]>([]);
 const empty = ref(false);
 
-getBookList();
 
 function getBookList() {
     getFavoriteBookListAPi(page.value, pageSize.value, '', -1)
@@ -131,13 +130,6 @@ function getBookList() {
         });
 }
 
-// 获取书籍标签
-getAllTag().then(res => {
-    for (let tag of res) {
-        tagMap.set(tag.id, tag);
-    }
-    tags.value = res;
-});
 
 function toBookPage(book: FavoriteBookInfo) {
 
@@ -192,8 +184,20 @@ function getLastRead(lastReadTime: number) {
     }
 }
 
+function refresh() {
+    // 获取书籍标签
+    getAllTag().then(res => {
+        for (let tag of res) {
+            tagMap.set(tag.id, tag);
+        }
+        tags.value = res;
+    });
+
+    getBookList();
+}
+
 defineExpose({
-    'refresh': getBookList
+    'refresh': refresh
 })
 
 </script>

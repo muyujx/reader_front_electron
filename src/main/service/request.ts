@@ -59,6 +59,8 @@ export function initRequestIpc() {
         const param = args[0];
         const url = parseUrl(param.path);
 
+        console.debug(`[http] [get] url = ${url}`);
+
         return axiosObj.get(url, {
             params: param.query,
             headers: {
@@ -73,6 +75,8 @@ export function initRequestIpc() {
     ipcMain.handle(ipcChannel.rqPost, async (event: any, args: PostParam[]) => {
         const param = args[0];
         const url = parseUrl(param.path);
+
+        console.debug(`[http] [post] url = ${url}`);
 
         return axiosObj.post(url, param.body, {
             headers: {

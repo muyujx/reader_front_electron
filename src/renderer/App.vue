@@ -19,14 +19,16 @@
 import {themeStore} from "./store/theme.ts";
 import TitleBar from "./components/window/TitleBar.vue";
 import hotkeys from 'hotkeys-js';
+import {useRouter} from "vue-router";
 
 const theme = themeStore();
 document.body.classList.add(theme.current);
+const router = useRouter();
 
 
 hotkeys('ctrl+s', (e) => e.preventDefault());
 hotkeys('esc', (e) => {
-    window.history.back();
+    router.back();
 });
 hotkeys('f11', fullScreen);
 

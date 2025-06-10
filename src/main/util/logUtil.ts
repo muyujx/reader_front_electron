@@ -1,13 +1,19 @@
 import log from 'electron-log';
 import path from "node:path";
 import {getLogDir} from "../config";
+import {isDevEnv} from "./env";
 
 
 export async function initLog() {
 
     log.initialize();
 
-    log.transports.console.level = "info";
+    if (isDevEnv()) {
+        log.transports.console.level = "debug";
+    } else {
+        log.transports.console.level = "info";
+    }
+
     log.transports.console.useStyles = true;
     log.transports.console.format = '[{h}:{i}:{s}.{ms}] [{level}] >  {text}';
 
@@ -17,6 +23,9 @@ export async function initLog() {
     log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] >  {text}';
 
     console.log = log.log;
+    console.debug = log.debug;
+    console.error = log.error;
+    console.info = log.info;
 
     log.log("log initialize success!");
 }

@@ -319,6 +319,8 @@ async function initPage(bookId: number) {
 
     onBeforeUnmount(() => {
         clearInterval(intervalId);
+        // 推出前更新当前页
+        updateRemotePage(bookId, curPageItem.value.page);
     });
 
     if (remotePage != localPage) {

@@ -47,11 +47,9 @@
 
             <BookShelf ref="bookshelf_view" v-show="curTab == Tab.Library"/>
 
-
             <FavoriteBook ref="favorite_view" v-show="curTab == Tab.Favorite"/>
 
             <Config ref="config_view" v-show="curTab == Tab.Config"/>
-
 
         </div>
 
@@ -63,7 +61,7 @@
 
 <script setup lang="ts">
 import BookShelf from "../BookShelf/BookShelf.vue";
-import {ref, useTemplateRef} from 'vue';
+import {onMounted, ref, useTemplateRef} from 'vue';
 import Config from "../Config/Config.vue";
 import {Grid, Management, Tools} from "@element-plus/icons-vue";
 import FavoriteBook from "../FavoriteBook/FavoriteBook.vue";
@@ -93,6 +91,12 @@ function changeTab(tab: Tab) {
 
     setLocalStorage(HOME_TAB, tab);
 }
+
+
+onMounted(() => {
+    // 刷新显示页面的内容
+    changeTab(curTab.value);
+})
 
 
 </script>
