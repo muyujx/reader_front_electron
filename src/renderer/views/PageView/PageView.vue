@@ -298,7 +298,6 @@ const pageConfirmLocal = ref(0);
 let updateInterval = -1;
 
 onBeforeUnmount(() => {
-    console.log("-------- onBeforeUnmount page -----");
     if (updateInterval == -1) {
         return;
     }

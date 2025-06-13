@@ -48,18 +48,13 @@
                     <p class="name">{{ book.bookName }}</p>
 
                     <div class="item">
-                        <p>上次读到:</p>
-                        <p>{{ book.lastRead == 0 ? 0 : book.page }}页</p>
-                    </div>
+                        <p>阅读进度:</p>
 
-                    <div class="item">
-                        <p>总页数:</p>
-                        <p>{{ book.totalPage }}页</p>
-                    </div>
+                        <div class="detail_item_content">
+                            <p>{{ book.lastRead == 0 ? 0 : book.page }} / {{ book.totalPage }} 页</p>
+                            <p>{{ book.lastRead == 0 ? 0 : (book.page / book.totalPage * 100).toFixed(2) }}%</p>
+                        </div>
 
-                    <div class="item">
-                        <p>进度:</p>
-                        <p>{{ book.lastRead == 0 ? 0 : (book.page / book.totalPage * 100).toFixed(2) }}%</p>
                     </div>
 
                     <div class="item">

@@ -76,11 +76,15 @@
     }
   }
 
+  .item + .item {
+    margin-top: 3px;
+  }
 
   .item {
     display: flex;
     font-size: 12px;
     margin-top: 1px;
+
 
     p:first-child {
       //background-color: #1E611E;
@@ -89,6 +93,15 @@
 
     p {
       margin: 0;
+    }
+
+    .detail_item_content {
+      display: flex;
+      flex-direction: column;
+
+      p {
+        width: 100px;
+      }
     }
   }
 
@@ -109,6 +122,9 @@
     //background-color: #1E611E;
   }
 }
+
+
+
 
 .book {
   width: 300px;
