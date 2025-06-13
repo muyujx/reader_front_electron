@@ -323,10 +323,10 @@ async function initPage(bookId: number) {
     getPageHtml(resPage);
 
     updateInterval = setInterval(() => {
-        console.log(`---------- remote update bookId = ${bookId} ---------`);
 
         if (resPage != curPageItem.value.page) {
             resPage = curPageItem.value.page;
+            console.log(`---------- remote update bookId = ${bookId}, page = ${resPage} ---------`);
             updateRemotePage(bookId, resPage);
         }
     }, 5 * 1000);
