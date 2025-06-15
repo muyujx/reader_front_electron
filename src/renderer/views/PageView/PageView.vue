@@ -16,7 +16,11 @@
              @touchmove.stop="touchControl.touchmove"
              @touchend.stop="touchControl.touchend"
              @click="toggleFooter"
-             ref="pageContainer">
+             ref="pageContainer"
+             :class="{
+                    'show_contents': showContents
+                }"
+        >
 
 
             <div class="book_cover"
@@ -28,9 +32,7 @@
 
 
                 <div class="page_content"
-                :class="{
-                    'show_contents': showContents
-                }"
+
                 >
 
                     <div class="page_indicator">
