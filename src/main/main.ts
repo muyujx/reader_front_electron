@@ -8,6 +8,9 @@ import {initIpcEvent} from "./service/init";
 import {getWinSize} from "./config";
 import {isDevEnv} from "./util/env";
 
+if (isDevEnv()) {
+    app.commandLine.appendSwitch('show-fps-counter');
+}
 
 const createWindow = async () => {
 

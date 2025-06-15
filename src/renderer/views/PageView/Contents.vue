@@ -2,8 +2,7 @@
 
     <div class="contents"
          :class="{
-            show: showContents,
-            'ink-mod': inkMode.current
+            show: showContents
          }">
         <div class="contents_header">
 
@@ -59,7 +58,6 @@ import {getContents} from "../../apis/book";
 import {getLocalStorageBoolean, setLocalStorage} from "../../utils/localStorageUtil";
 import {Expand, Fold} from '@element-plus/icons-vue';
 import hotkeys from "hotkeys-js";
-import {inkModeStore} from "../../store/inkMode";
 import {binarySearch} from "../../utils/util";
 
 const props = defineProps<{
@@ -69,10 +67,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (e: 'skipChapter', page: number): void,
-    (e: 'skipCoverPage'): void
+    (e: 'skipCoverPage'): void,
+    (e: 'open'): void,
+    (e: 'close'): void
 }>();
-
-const inkMode = inkModeStore();
 
 const contentsStateKey = `content_state_${props.bookId}`;
 
@@ -80,11 +78,20 @@ const contents = ref(new Array<ContentsItem>());
 
 // 是否显示目录
 const showContents = ref(getLocalStorageBoolean(contentsStateKey, true));
+notifyShow();
 
 // 获取目录数据
 getContents(props.bookId).then((contentList: ContentsItem[]) => {
     contents.value = contentList;
 });
+
+function notifyShow () {
+    if (showContents.value) {
+        emit('open');
+    } else {
+        emit('close');
+    }
+}
 
 /**
  * 开关目录
@@ -93,9 +100,10 @@ function toggleContents(evt: any) {
     evt.preventDefault();
     showContents.value = !showContents.value;
     setLocalStorage(contentsStateKey, showContents.value.toString());
+    notifyShow();
 }
 
-hotkeys('tab',  toggleContents);
+hotkeys('tab', toggleContents);
 onBeforeUnmount(() => {
     hotkeys.unbind('tab');
 });
@@ -148,7 +156,6 @@ defineExpose({
     flex-shrink: 0;
     width: var(--contents-width);
 
-    margin-left: calc(0px - var(--contents-width));
 
     user-select: none;
     display: flex;
@@ -162,11 +169,11 @@ defineExpose({
 
     z-index: 100;
 
-    //transform: translateX(-500px);
-
+    position: absolute;
+    transform: translateX(calc(0px - var(--contents-width)));
 
     &.show {
-        margin-left: 0;
+        transform: translateX(0);
     }
 }
 
@@ -348,7 +355,6 @@ defineExpose({
     }
 
     .contents_item {
-        font-size: 10px;
 
         & > p:last-child {
             width: 20px;

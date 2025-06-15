@@ -1,16 +1,14 @@
 <template>
 
-    <div class="page_view"
-         :class="{
-            'ink-mod': inkMod.current
-         }"
-    >
+    <div class="page_view">
 
         <Contents ref="contents"
                   :book-id="bookId"
                   :book-name="bookInfo.bookName"
                   @skip-chapter="getPageHtml"
                   @skip-cover-page="getPageHtml(PageCache.COVER_PAGE)"
+                  @open="showContents = true"
+                  @close="showContents = false"
         />
 
         <div class="page_container"
@@ -29,7 +27,11 @@
             <template v-else>
 
 
-                <div class="page_content">
+                <div class="page_content"
+                :class="{
+                    'show_contents': showContents
+                }"
+                >
 
                     <div class="page_indicator">
                         <p class="page_title">{{ curPageItem.title ?? '' }}</p>
@@ -84,10 +86,6 @@
                    @open-contents="openContents"
     />
 
-
-    <Config ref="config" :show-open="!inkMod.current"/>
-
-
     <el-dialog
         class="page_confirm"
         v-model="pageConfirm"
@@ -125,9 +123,7 @@ import {PageType, pageTypeStore} from "../../store/pageType";
 import {ScreenResizeListener} from "./fullScreenListener";
 import Clock from "../../components/Clock.vue";
 import {scaleStore} from "../../store/scale";
-import {inkModeStore} from "../../store/inkMode";
 import ViewFooterBar from "../../components/ViewFooterBar.vue";
-import Config from "../Config/Config.vue";
 import {getRemotePage, updateRemotePage} from "../../apis/userRemotePage";
 import {addHost} from "../../apis/request.ts";
 import {recordReadingTime} from "./pageView.ts";
@@ -138,10 +134,10 @@ const showClock = ref(false);
 const pageType = pageTypeStore();
 // 书页方法倍数
 const scale = scaleStore();
-// 墨水屏模式
-const inkMod = inkModeStore();
 // 显示底部控制框
 const showFooter = ref(true);
+// 目录是否显示
+const showContents = ref(false);
 
 // 判断是否全屏
 const screeResize = new ScreenResizeListener();
