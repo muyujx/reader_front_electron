@@ -12,14 +12,17 @@ export function recordReadingTime(bookId: number) {
     const minTime = 10;
 
     let cost = 0;
+    let windowActive = true;
 
     const blurFunc = () => {
         const now = Date.now() / 1000;
         cost += now - start;
+        windowActive = false;
     }
 
     const focusFunc = () => {
         start = Date.now() / 1000;
+        windowActive = true;
     }
 
     // 当窗口失去焦点时触发
@@ -28,6 +31,10 @@ export function recordReadingTime(bookId: number) {
     window.addEventListener('focus', focusFunc);
 
     const updateCostFunc = () => {
+        if (!windowActive) {
+            return;
+        }
+
         const now = Date.now() / 1000;
         cost += now - start;
         start = now;
