@@ -117,8 +117,8 @@
 <style scoped src="./BookShelf.less" lang="less"/>
 
 <script setup lang="ts">
-import {onBeforeUnmount, useTemplateRef, ref} from "vue";
-import {onBeforeRouteUpdate, useRouter} from "vue-router";
+import {useTemplateRef, ref} from "vue";
+import {useRouter} from "vue-router";
 import {BookInfo, BookShelfList} from "../../model/pageModel";
 import {getBookInfoList} from "../../apis/book";
 import {getLocalStorage, getLocalStorageInt, setLocalStorage} from "../../utils/localStorageUtil";
@@ -134,6 +134,7 @@ import {UserRole} from "../../model/user.ts";
 import {Star, StarFilled} from "@element-plus/icons-vue";
 import {addFavoriteApi, delFavoriteApi} from "../../apis/favoriteBook.ts";
 import {popErr, popSuccess} from "../../utils/message.ts";
+import {loadingStore} from "../../store/loading.ts";
 
 const PAGE_LIST_INDEX = "page_list_index";
 const PAGE_LIST_SEARCH = "page_list_search";
@@ -159,25 +160,15 @@ const tags = ref<BookTag[]>([]);
 const tagMap = new Map<number, BookTag>;
 const titlePopoverDisable = ref(false);
 
+const loading = loadingStore();
 // 用来控制点击书籍的动画触发
 const curBookId = ref(-1);
 
 const curTag = ref(-1);
 let tagBookId = -1;
 
+console.log("---------- bookshelf setup ---------");
 
-function refresh() {
-
-    getBookList();
-    // 获取书籍标签
-    getAllTag().then(res => {
-        for (let tag of res) {
-            tagMap.set(tag.id, tag);
-        }
-        tags.value = res;
-    });
-
-}
 
 initPage();
 
@@ -294,29 +285,30 @@ function searchBookList() {
 }
 
 function next() {
+    console.log("-------- bookshelf next --------");
     jumpToPage(page.value + 1);
 }
 
 function pre() {
+    console.log("-------- bookshelf pre --------");
     jumpToPage(page.value - 1)
 }
-
-hotkeys('left, up, a', 'book-shelf', pre);
-hotkeys('right, down, d, f', 'book-shelf', next);
-hotkeys.setScope('book-shelf');
-onBeforeUnmount(() => {
-    hotkeys.deleteScope('book-shelf');
-});
 
 const touchControl = new TouchControl();
 touchControl.onSwipeLeft(next);
 touchControl.onSwipeRight(pre);
 
 function getBookList() {
+
+    loading.show();
+
     getBookInfoList(page.value, pageSize.value, searchStr.value, tag.value)
         .then((bookInfoList: BookShelfList) => {
             totalPage.value = bookInfoList.totalPage;
             booKList.value = bookInfoList.content;
+        })
+        .finally(() => {
+            loading.hide();
         });
 }
 
@@ -357,8 +349,30 @@ function changeFavorite(book: BookInfo) {
     })
 }
 
+function enter() {
+
+    hotkeys('left, up, a', 'book-shelf', pre);
+    hotkeys('right, down, d, f', 'book-shelf', next);
+    hotkeys.setScope('book-shelf');
+
+    getBookList();
+    // 获取书籍标签
+    getAllTag().then(res => {
+        for (let tag of res) {
+            tagMap.set(tag.id, tag);
+        }
+        tags.value = res;
+    });
+
+}
+
+function leave() {
+    hotkeys.deleteScope('book-shelf');
+}
+
 defineExpose({
-    'refresh': refresh
+    'enter': enter,
+    'leave': leave
 })
 
 </script>

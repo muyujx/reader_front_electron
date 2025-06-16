@@ -6,6 +6,8 @@
         <router-view/>
     </div>
 
+    <Loading/>
+
 </template>
 
 <style src="./styles/Themes.less" lang="less"/>
@@ -20,6 +22,7 @@ import {themeStore} from "./store/theme.ts";
 import TitleBar from "./components/window/TitleBar.vue";
 import hotkeys from 'hotkeys-js';
 import {useRouter} from "vue-router";
+import Loading from "./components/Loading.vue";
 
 const theme = themeStore();
 document.body.classList.add(theme.current);

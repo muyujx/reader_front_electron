@@ -80,22 +80,41 @@ const curTab = ref<Tab>(getLocalStorageInt(HOME_TAB, Tab.Library));
 const favoriteView = useTemplateRef<InstanceType<typeof FavoriteBook>>("favorite_view");
 const bookShelfView = useTemplateRef<InstanceType<typeof BookShelf>>("bookshelf_view");
 
-function changeTab(tab: Tab) {
-    curTab.value = tab;
-    if (tab == Tab.Favorite) {
-        favoriteView?.value?.refresh();
-    }
-    if (tab == Tab.Library) {
-        bookShelfView?.value?.refresh();
+function changeTab(tab: Tab, isInit = false) {
+    if (curTab.value == tab && !isInit) {
+        return;
     }
 
+    switch (curTab.value) {
+        case Tab.Library: {
+            bookShelfView?.value?.leave();
+            break;
+        }
+        case Tab.Favorite: {
+            favoriteView?.value?.leave();
+            break;
+        }
+    }
+
+    switch (tab) {
+        case Tab.Library: {
+            bookShelfView?.value?.enter();
+            break;
+        }
+        case Tab.Favorite: {
+            favoriteView?.value?.enter();
+            break;
+        }
+    }
+
+    curTab.value = tab;
     setLocalStorage(HOME_TAB, tab);
 }
 
 
 onMounted(() => {
     // 刷新显示页面的内容
-    changeTab(curTab.value);
+    changeTab(curTab.value, true);
 })
 
 

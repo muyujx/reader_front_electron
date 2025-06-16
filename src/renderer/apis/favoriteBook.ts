@@ -5,7 +5,7 @@ import {FavoriteBookList} from "../model/favoriteBook.ts";
 /**
  * 获取书籍列表
  */
-export function getFavoriteBookListAPi(page: number, pageSize: number, search: string, tag: number): Promise<FavoriteBookList> {
+export function getFavoriteBookListAPi(page: number, pageSize: number): Promise<FavoriteBookList> {
     return rq.post({
         url: `/api/favorite/list`,
         body: {

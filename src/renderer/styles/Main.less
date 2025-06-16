@@ -21,7 +21,6 @@ html, body, #app, #main {
 }
 
 #main {
-  height: calc(100% - 30px);
   --el-color-primary: var(--primary);
   --el-input-text-color: var(--accent);
   color: var(--foreground);
@@ -38,15 +37,3 @@ input[type="number"] {
 }
 
 
-// 对 element plus 组件的全局修改
-
-.el-popper {
-  color: var(--foreground) !important;
-  background-color: var(--second) !important;
-  border: none !important;
-}
-
-.el-popper__arrow::before {
-  background-color: var(--second) !important;
-  border: none !important;
-}

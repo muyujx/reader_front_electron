@@ -78,6 +78,7 @@
 
 
         <el-pagination
+            v-model:current-page="page"
             v-model:page-size="pageSize"
             layout="prev, pager, next, jumper"
             :page-count="totalPage"
@@ -103,6 +104,8 @@ import {FavoriteBookInfo, FavoriteBookList} from "../../model/favoriteBook.ts";
 import moment from "moment";
 import {MostlyCloudy, StarFilled} from "@element-plus/icons-vue";
 import {popErr, popSuccess} from "../../utils/message.ts";
+import {loadingStore} from "../../store/loading.ts";
+import hotkeys from "hotkeys-js";
 
 const bookList = ref(new Array<FavoriteBookInfo>());
 const page = ref(1);
@@ -112,16 +115,26 @@ const router = useRouter();
 const tagMap = new Map<number, BookTag>;
 const tags = ref<BookTag[]>([]);
 const empty = ref(false);
+const loading = loadingStore();
+
+
+console.log("---------- favorite setup ---------");
 
 
 function getBookList() {
-    getFavoriteBookListAPi(page.value, pageSize.value, '', -1)
+
+    loading.show();
+
+    getFavoriteBookListAPi(page.value, pageSize.value)
         .then((bookInfoList: FavoriteBookList) => {
 
             empty.value = (bookInfoList.totalPage == 0);
 
             totalPage.value = bookInfoList.totalPage;
             bookList.value = bookInfoList.content;
+        })
+        .finally(() => {
+            loading.hide();
         });
 }
 
@@ -179,7 +192,12 @@ function getLastRead(lastReadTime: number) {
     }
 }
 
-function refresh() {
+function enter() {
+
+    hotkeys('left, a, s, page up', 'favorite', () => jumpToPage(page.value - 1));
+    hotkeys('right, f, d, page down', 'favorite', () => jumpToPage(page.value + 1));
+    hotkeys.setScope('favorite');
+
     // 获取书籍标签
     getAllTag().then(res => {
         for (let tag of res) {
@@ -191,8 +209,13 @@ function refresh() {
     getBookList();
 }
 
+function leave() {
+    hotkeys.deleteScope('favorite');
+}
+
 defineExpose({
-    'refresh': refresh
+    'enter': enter,
+    'leave': leave,
 })
 
 </script>
