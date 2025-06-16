@@ -16,7 +16,9 @@ export const loadingStore = defineStore('loading', {
             if (loadingCount === 0) {
 
                 setTimeout(() => {
-                    this.isLoading = false
+                    if (loadingCount == 0) {
+                        this.isLoading = false
+                    }
                 }, 100);
 
             }
