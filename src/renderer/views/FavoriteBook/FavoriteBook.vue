@@ -159,7 +159,7 @@ function jumpToPage(pageIdx: number) {
 
     console.log(`pageIdx = ${pageIdx}, totalPage = ${totalPage.value}, page = ${page.value}`);
 
-    if (pageIdx < 1 || (totalPage.value != 0 && pageIdx > totalPage.value) || page.value == pageIdx) {
+    if (pageIdx < 1 || (totalPage.value != 0 && pageIdx > totalPage.value)) {
         return;
     }
     page.value = pageIdx;
