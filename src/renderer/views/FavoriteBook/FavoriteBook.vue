@@ -52,7 +52,14 @@
 
                         <div class="detail_item_content">
                             <p>{{ book.lastRead == 0 ? 0 : book.page }} / {{ book.totalPage }} 页</p>
-                            <p>{{ book.lastRead == 0 ? 0 : (book.page / book.totalPage * 100).toFixed(2) }}%</p>
+
+                            <el-progress
+                                :text-inside="true"
+                                :stroke-width="15"
+                                :format="num => `${num == 0 ? '0' : num.toFixed(2)}%`"
+                                :percentage="book.lastRead == 0 ? 0 : (book.page / book.totalPage * 100)"
+                            />
+
                         </div>
 
                     </div>
