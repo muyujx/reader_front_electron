@@ -17,7 +17,7 @@
         </div>
 
 
-        <div class="contents_body">
+        <div class="contents_body" ref="contentsBody">
 
             <div
                 class="contents_item"
@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import {onBeforeUnmount, ref, Ref} from "vue";
+import {nextTick, onBeforeUnmount, onMounted, ref, Ref, useTemplateRef} from "vue";
 import {ContentsItem} from "../../model/contentsModel";
 import {getContents} from "../../apis/book";
 import {getLocalStorageBoolean, setLocalStorage} from "../../utils/localStorageUtil";
@@ -85,7 +85,7 @@ getContents(props.bookId).then((contentList: ContentsItem[]) => {
     contents.value = contentList;
 });
 
-function notifyShow () {
+function notifyShow() {
     if (showContents.value) {
         emit('open');
     } else {
@@ -139,9 +139,39 @@ defineExpose({
             curChapter.value = null;
         } else {
             curChapter.value = contents.value[idx];
+
+            nextTick(() => {
+                scrollToMid();
+            });
         }
     }
 })
+
+const contentsBody = useTemplateRef("contentsBody");
+
+onMounted(() => {
+    scrollToMid();
+});
+
+function scrollToMid() {
+    // @ts-ignore
+    const container = contentsBody.value?.$el || contentsBody.value;
+    if (!container) {
+        return;
+    }
+    // 获取当前 active 元素
+    const activeEl = container.querySelector('.active');
+    if (!activeEl) {
+        return;
+    }
+
+    const offsetTop = activeEl.offsetTop;
+    container.scrollTo({
+        top: offsetTop - container.clientHeight / 2,
+        behavior: 'smooth'
+    });
+}
+
 
 </script>
 
