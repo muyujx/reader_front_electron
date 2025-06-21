@@ -14,14 +14,21 @@
         </div>
 
         <div class="search">
-            <el-input
-                class="search-input"
+
+            <el-autocomplete
+                placement="bottom"
                 v-model.trim="searchStr"
+                :fetch-suggestions="searchOnType"
                 placeholder="根据书名或作者名搜索"
-                @change="searchBookList"
-                maxlength="30"
-                size="large"
-            />
+                @blur="searchBookList"
+                :teleported="false"
+            >
+                <template #default="{ item }">
+                    <div v-html="item.label"></div>
+                </template>
+
+            </el-autocomplete>
+
         </div>
 
         <div>
@@ -121,7 +128,7 @@ import {useTemplateRef, ref} from "vue";
 import {useRouter} from "vue-router";
 import {BookInfo, BookShelfList} from "../../model/pageModel";
 import {getBookInfoList} from "../../apis/book";
-import {getLocalStorage, getLocalStorageInt, setLocalStorage} from "../../utils/localStorageUtil";
+import {getLocalStorageInt, setLocalStorage} from "../../utils/localStorageUtil";
 import hotkeys from "hotkeys-js";
 import Tags from "./BookTags.vue";
 import {TouchControl} from "../../service/touchControl";
@@ -135,13 +142,12 @@ import {Star, StarFilled} from "@element-plus/icons-vue";
 import {addFavoriteApi, delFavoriteApi} from "../../apis/favoriteBook.ts";
 import {popErr, popSuccess} from "../../utils/message.ts";
 import {loadingStore} from "../../store/loading.ts";
+import {searchOnType} from "./BookShelf.ts";
 
 const PAGE_LIST_INDEX = "page_list_index";
-const PAGE_LIST_SEARCH = "page_list_search";
 const PAGE_TAG_LOCAL = "page_tag_local";
 
 const DEFAULT_FIRST_PAGE = 1;
-const DEFAULT_SEARCH_STR = "";
 const DEFAULT_TAG = -1;
 
 const page = ref(1);
@@ -175,7 +181,6 @@ initPage();
 function initPage(): void {
     // 从 localStorage 中获取上次访问的页
     page.value = getLocalStorageInt(PAGE_LIST_INDEX, DEFAULT_FIRST_PAGE);
-    searchStr.value = getLocalStorage(PAGE_LIST_SEARCH, DEFAULT_SEARCH_STR);
     tag.value = getLocalStorageInt(PAGE_TAG_LOCAL, DEFAULT_TAG);
 }
 
@@ -263,7 +268,6 @@ function jumpToPage(pageIdx: number) {
     getBookList();
 
     setLocalStorage(PAGE_LIST_INDEX, page.value.toString());
-    setLocalStorage(PAGE_LIST_SEARCH, searchStr.value.toString());
     setLocalStorage(PAGE_TAG_LOCAL, tag.value.toString());
 }
 

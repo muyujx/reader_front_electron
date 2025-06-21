@@ -1,6 +1,7 @@
 import {BookInfo, BookShelfList, PageItem} from "../model/pageModel";
 import rq from "./request";
 import {ContentsItem} from "../model/contentsModel";
+import {BookSearchOnTypeItem} from "../model/book.ts";
 
 /**
  * 获取书籍列表
@@ -60,6 +61,17 @@ export function getContents(bookId: number): Promise<ContentsItem[]> {
 }
 
 
-
-
+/**
+ * 在输入时搜索
+ *
+ * @param query 搜索字符串
+ */
+export function searchOnTypeApi(query: string): Promise<BookSearchOnTypeItem[]> {
+    return rq.post({
+        url: `/api/book/info/search/on_type`,
+        body: {
+            query
+        }
+    })
+}
 

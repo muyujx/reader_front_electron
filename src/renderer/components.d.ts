@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckTag: typeof import('element-plus/es')['ElCheckTag']
     ElDialog: typeof import('element-plus/es')['ElDialog']

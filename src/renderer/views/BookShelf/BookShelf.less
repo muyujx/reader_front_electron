@@ -16,6 +16,32 @@
   user-select: none;
 }
 
+:deep(.el-autocomplete-suggestion) {
+
+  min-width: 500px !important;
+
+  color: var(--text);
+
+  em {
+    font-style: normal;
+    color: var(--primary);
+  }
+
+  .el-autocomplete-suggestion__wrap {
+    max-height: 500px;
+  }
+
+  .el-autocomplete-suggestion__list {
+    li:hover {
+      background-color: var(--selectBg);
+    }
+
+    li + li {
+      margin-top: 3px;
+    }
+  }
+}
+
 
 .search {
   width: 300px;
