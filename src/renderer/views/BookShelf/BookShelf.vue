@@ -21,6 +21,8 @@
                 :fetch-suggestions="searchOnType"
                 placeholder="根据书名或作者名搜索"
                 @blur="searchBookList"
+                @keyup.enter="enterSearch"
+                :trigger-on-focus="false"
                 :teleported="false"
             >
                 <template #default="{ item }">
@@ -128,7 +130,7 @@ import {useTemplateRef, ref} from "vue";
 import {useRouter} from "vue-router";
 import {BookInfo, BookShelfList} from "../../model/pageModel";
 import {getBookInfoList} from "../../apis/book";
-import {getLocalStorageInt, setLocalStorage} from "../../utils/localStorageUtil";
+import {getLocalStorage, getLocalStorageInt, setLocalStorage} from "../../utils/localStorageUtil";
 import hotkeys from "hotkeys-js";
 import Tags from "./BookTags.vue";
 import {TouchControl} from "../../service/touchControl";
@@ -146,9 +148,11 @@ import {searchOnType} from "./BookShelf.ts";
 
 const PAGE_LIST_INDEX = "page_list_index";
 const PAGE_TAG_LOCAL = "page_tag_local";
+const PAGE_LIST_SEARCH = "page_list_search";
 
 const DEFAULT_FIRST_PAGE = 1;
 const DEFAULT_TAG = -1;
+const DEFAULT_SEARCH_STR = "";
 
 const page = ref(1);
 const pageSize = ref(18);
@@ -182,6 +186,7 @@ function initPage(): void {
     // 从 localStorage 中获取上次访问的页
     page.value = getLocalStorageInt(PAGE_LIST_INDEX, DEFAULT_FIRST_PAGE);
     tag.value = getLocalStorageInt(PAGE_TAG_LOCAL, DEFAULT_TAG);
+    searchStr.value = getLocalStorage(PAGE_LIST_SEARCH, DEFAULT_SEARCH_STR);
 }
 
 function toBookPage(bookId: number) {
@@ -269,32 +274,40 @@ function jumpToPage(pageIdx: number) {
 
     setLocalStorage(PAGE_LIST_INDEX, page.value.toString());
     setLocalStorage(PAGE_TAG_LOCAL, tag.value.toString());
+    setLocalStorage(PAGE_LIST_SEARCH, searchStr.value.toString());
 }
 
 
-// 上一次搜索的字符串是否为空
-let lastIsEmpty = false;
+// 上一次搜索的字符串
+let lastSearch = '';
 const tagsComp = useTemplateRef<InstanceType<typeof Tags> | null>("tagsComp");
 
 function searchBookList() {
 
+    if (lastSearch == searchStr.value) {
+        return;
+    }
+
     // 搜索字符串由空变变有内容, 修改 tag 为所有
-    if (lastIsEmpty && searchStr.value.length > 0) {
+    if (lastSearch.length == 0 && searchStr.value.length > 0) {
         tag.value = -1;
         tagsComp.value?.changeTag(-1);
     }
 
-    lastIsEmpty = searchStr.value.length == 0;
+    lastSearch = searchStr.value;
     jumpToPage(1);
 }
 
+function enterSearch(event: KeyboardEvent) {
+    // @ts-ignore
+    event?.target?.blur();
+}
+
 function next() {
-    console.log("-------- bookshelf next --------");
     jumpToPage(page.value + 1);
 }
 
 function pre() {
-    console.log("-------- bookshelf pre --------");
     jumpToPage(page.value - 1)
 }
 
@@ -303,6 +316,9 @@ touchControl.onSwipeLeft(next);
 touchControl.onSwipeRight(pre);
 
 function getBookList() {
+
+    console.log("----------- getBookList --------");
+
 
     loading.show();
 
