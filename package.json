@@ -8,7 +8,9 @@
   "scripts": {
     "electron:dev": "node scripts/dev-server.js",
     "electron:build": "node scripts/build.js && electron-builder ",
-    "build:win": "node scripts/build.js && electron-builder --win"
+    "build:win": "node scripts/build.js && electron-builder --win",
+
+    "dev:build:local": "node scripts/build.js && electron-builder & ./deploy_local.ps1"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",

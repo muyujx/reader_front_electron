@@ -1,16 +1,14 @@
 node_modules
 .DS_Store
 dist
-dist.*
 .idea
 .vscode
 docker
-deploy.ps1
 yarn.lock
 release
 build
-data
-tmp
+
+/*_local.ps1
 
 /src/common/hostConfig.ts
 
