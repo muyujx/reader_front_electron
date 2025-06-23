@@ -280,7 +280,7 @@ function jumpToPage(pageIdx: number) {
 
 
 // 上一次搜索的字符串
-let lastSearch = '';
+let lastSearch: string | null = null;
 const tagsComp = useTemplateRef<InstanceType<typeof Tags> | null>("tagsComp");
 
 function searchBookList() {
@@ -290,7 +290,7 @@ function searchBookList() {
     }
 
     // 搜索字符串由空变变有内容, 修改 tag 为所有
-    if (lastSearch.length == 0 && searchStr.value.length > 0) {
+    if ((lastSearch == null || lastSearch.length == 0) && searchStr.value.length > 0) {
         tag.value = -1;
         tagsComp.value?.changeTag(-1);
     }
