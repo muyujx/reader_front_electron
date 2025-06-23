@@ -16,11 +16,16 @@
   user-select: none;
 }
 
+
+:deep(.el-autocomplete__popper) {
+  border-radius: 7px;
+}
+
 :deep(.el-autocomplete-suggestion) {
 
   min-width: 500px !important;
 
-  color: var(--text);
+  --el-text-color-regular: var(--text);
 
   em {
     font-style: normal;
