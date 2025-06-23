@@ -154,7 +154,8 @@ function toBookPage(book: FavoriteBookInfo) {
             name: "Read",
             query: {
                 "bookId": book.bookId,
-                "remotePage": book.page
+                "remotePage": book.page,
+                "favorite": "true",
             }
         }).then();
 

@@ -69,7 +69,7 @@
                     <template #reference>
 
                         <div class="book"
-                             @click="toBookPage(book.bookId)"
+                             @click="toBookPage(book.bookId, book.favorite)"
                              @contextmenu.prevent="chooseTag(book, $event.target)"
                              :class="{
                                  'active': curBookId == book.bookId
@@ -189,7 +189,7 @@ function initPage(): void {
     searchStr.value = getLocalStorage(PAGE_LIST_SEARCH, DEFAULT_SEARCH_STR);
 }
 
-function toBookPage(bookId: number) {
+function toBookPage(bookId: number, favorite: boolean) {
     curBookId.value = bookId;
 
     setTimeout(() => {
@@ -201,7 +201,8 @@ function toBookPage(bookId: number) {
         router.push({
             name: "Read",
             query: {
-                "bookId": bookId
+                "bookId": bookId,
+                "favorite": String(favorite),
             }
         }).then();
 
