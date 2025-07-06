@@ -33,7 +33,7 @@ hotkeys('ctrl+s', (e) => e.preventDefault());
 hotkeys('esc', (e) => {
     router.back();
 });
-hotkeys('f11', fullScreen);
+hotkeys('f11, enter', fullScreen);
 
 let full = false;
 
