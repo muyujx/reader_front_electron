@@ -7,6 +7,7 @@ docker
 yarn.lock
 release
 build
+.env.local
 
 /*_local.ps1
 

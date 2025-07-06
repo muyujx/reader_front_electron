@@ -1,16 +1,17 @@
 {
   "name": "reader",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "build/main/main.js",
   "license": "MIT",
   "author": "muyu",
   "description": "reader",
   "scripts": {
-    "electron:dev": "node scripts/dev-server.js",
-    "electron:build": "node scripts/build.js && electron-builder ",
+    "prebuild": "node scripts/build-meta.js",
+    "predev": "node scripts/build-meta.js",
+    "dev": "node scripts/dev-server.js",
+    "build": "node scripts/build.js && electron-builder ",
     "build:win": "node scripts/build.js && electron-builder --win",
-
-    "dev:build:local": "node scripts/build.js && electron-builder && powershell -ExecutionPolicy Bypass -File deploy_local.ps1"
+    "build:dev:local": "node scripts/build.js && electron-builder && powershell -ExecutionPolicy Bypass -File deploy_local.ps1"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",

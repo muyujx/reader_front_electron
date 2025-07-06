@@ -97,6 +97,22 @@
                 </div>
             </div>
 
+            <div class="config-item">
+                <div class="config-title">
+                    版本:
+                </div>
+
+                <div class="config-text">{{ version }}</div>
+            </div>
+
+            <div class="config-item">
+                <div class="config-title">
+                    构建时间:
+                </div>
+
+                <div class="config-text">{{ buildTime }}</div>
+            </div>
+
 
         </div>
 
@@ -128,6 +144,8 @@ const userInfo = userStore();
 const cacheDir = ref('');
 const router = useRouter();
 
+const version = import.meta.env.VITE_APP_VERSION;
+const buildTime = import.meta.env.VITE_APP_BUILD_TIME;
 
 async function init() {
     // 获取当前的缓存根目录

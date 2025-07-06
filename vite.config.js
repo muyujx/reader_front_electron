@@ -19,7 +19,7 @@ console.log(Path.join(__dirname, 'src', 'renderer'));
 export default defineConfig({
     publicDir: 'public',
     root: Path.join(__dirname, 'src', 'renderer'),
-
+    envDir: __dirname,
     server: {
 
         port: 9797,
