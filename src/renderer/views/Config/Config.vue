@@ -92,7 +92,7 @@
                     <div>向前翻页: <kbd>A</kbd> <kbd>S</kbd> <kbd>&#x2190;</kbd></div>
                     <div>向后翻页: <kbd>D</kbd> <kbd>F</kbd> <kbd>&#x2192;</kbd></div>
                     <div>开关目录: <kbd>Tab</kbd></div>
-                    <div>全屏开关: <kbd>F11</kbd></div>
+                    <div>全屏开关: <kbd>F11</kbd> <kbd>Enter</kbd></div>
                     <div>快速选择书页中的图片: <kbd>W</kbd></div>
                 </div>
             </div>

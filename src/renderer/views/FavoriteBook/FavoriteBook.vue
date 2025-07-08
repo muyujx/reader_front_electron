@@ -66,7 +66,7 @@
 
                     <div class="item">
                         <p>阅读时间:</p>
-                        <p>{{ Math.floor(book.readingCost / 60) }} 分钟</p>
+                        <p>{{ readCost(book.readingCost) }}</p>
                     </div>
 
                     <div class="item">
@@ -123,10 +123,6 @@ const tagMap = new Map<number, BookTag>;
 const tags = ref<BookTag[]>([]);
 const empty = ref(false);
 const loading = loadingStore();
-
-
-console.log("---------- favorite setup ---------");
-
 
 function getBookList() {
 
@@ -198,6 +194,19 @@ function getLastRead(lastReadTime: number) {
         default:
             return daysDifference + "天前";
     }
+}
+
+function readCost(minutes: number): string {
+    minutes = Math.floor(minutes);
+    if (minutes < 60) {
+        return `${minutes} 分钟`
+    }
+    let hour = Math.floor(minutes / 60);
+    let minute = Math.floor(minutes % 60);
+    if (minute == 0) {
+        return `${hour} 小时`
+    }
+    return `${hour} 小时 ${minute} 分钟`;
 }
 
 function enter() {
