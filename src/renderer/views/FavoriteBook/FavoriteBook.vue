@@ -197,7 +197,7 @@ function getLastRead(lastReadTime: number) {
 }
 
 function readCost(minutes: number): string {
-    minutes = Math.floor(minutes);
+    minutes = Math.floor(minutes / 60);
     if (minutes < 60) {
         return `${minutes} 分钟`
     }
