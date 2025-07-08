@@ -10,6 +10,6 @@ build
 .env.local
 
 /*_local.ps1
-
+/proxyConfig.js
 /src/common/hostConfig.ts
 
