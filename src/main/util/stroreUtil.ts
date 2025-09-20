@@ -14,6 +14,9 @@ const config = new Map<string, string>();
 let finish = false;
 
 async function loadConfig() {
+
+    log.debug("logConfig function start");
+
     try {
         await fs.promises.access(configFile, fs.constants.F_OK);
     } catch (err: any) {
@@ -33,6 +36,9 @@ async function loadConfig() {
 }
 
 export async function getStore(key: string): Promise<string | null> {
+
+    log.debug("getStore key is ", key);
+
     if (key == null) {
         return null;
     }
@@ -46,6 +52,9 @@ export async function getStore(key: string): Promise<string | null> {
 }
 
 export function setStore(key: string, val: string) {
+
+    log.debug("setStore key is ", key);
+
     if (key == null) {
         return;
     }

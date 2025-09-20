@@ -12,6 +12,10 @@ import {isDevEnv} from "./util/env";
 //     app.commandLine.appendSwitch('show-fps-counter');
 // }
 
+process.on('uncaughtException', err => {
+    log.error('Main process error:', err);
+});
+
 const createWindow = async () => {
 
     const winSize = await getWinSize();

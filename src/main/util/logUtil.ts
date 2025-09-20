@@ -2,17 +2,19 @@ import log from 'electron-log';
 import path from "node:path";
 import {getLogDir} from "../config";
 import {isDevEnv} from "./env";
-
+import {app} from "electron";
 
 export async function initLog() {
 
     log.initialize();
 
-    if (isDevEnv()) {
+    if (app.commandLine.hasSwitch("debug") || isDevEnv()) {
         log.transports.console.level = "debug";
     } else {
         log.transports.console.level = "info";
     }
+
+    log.info("log level is ", log.transports.console.level);
 
     log.transports.console.useStyles = true;
     log.transports.console.format = '[{h}:{i}:{s}.{ms}] [{level}] >  {text}';

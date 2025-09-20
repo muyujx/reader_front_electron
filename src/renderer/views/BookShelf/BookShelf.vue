@@ -33,7 +33,7 @@
 
         </div>
 
-        <div>
+<!--        <div>-->
 
             <Tags
                 ref="tagsComp"
@@ -109,7 +109,7 @@
 
             </div>
 
-        </div>
+<!--        </div>-->
 
         <el-pagination
             v-model:current-page="page"

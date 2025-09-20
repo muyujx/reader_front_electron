@@ -1,99 +1,99 @@
 <template>
 
 
-    <div class="favorite">
+  <div class="favorite">
 
-        <div class="empty-notify"
-             :class="{
+    <div class="empty-notify"
+         :class="{
                 'active': empty
             }"
+    >
+      <el-icon>
+        <MostlyCloudy/>
+      </el-icon>
+      <p>还没有收藏书籍</p>
+    </div>
+
+
+    <div class="books">
+
+
+      <div class="book"
+           :content="book.bookName"
+           v-for="book in bookList"
+           :key="book.bookId"
+
+      >
+
+        <div class="cover"
+             @click="toBookPage(book)"
         >
-            <el-icon>
-                <MostlyCloudy/>
-            </el-icon>
-            <p>还没有收藏书籍</p>
+          <img :src="addHost(book.coverPic)" :alt="book.bookName"/>
+
         </div>
 
 
-        <div class="books">
+        <div class="detail">
 
+          <div class="cancel-favorite"
+               @click="cancelFavorite(book.bookId)"
+          >
 
-            <div class="book"
-                 :content="book.bookName"
-                 v-for="book in bookList"
-                 :key="book.bookId"
+            <el-icon>
+              <StarFilled/>
+            </el-icon>
 
-            >
+          </div>
 
-                <div class="cover"
-                     @click="toBookPage(book)"
-                >
-                    <img :src="addHost(book.coverPic)" :alt="book.bookName"/>
+          <p class="name">{{ book.bookName }}</p>
 
-                </div>
+          <div class="item">
+            <p>阅读进度:</p>
 
+            <div class="detail_item_content">
+              <p>{{ book.lastRead == 0 ? 0 : book.page }} / {{ book.totalPage }} 页</p>
 
-                <div class="detail">
-
-                    <div class="cancel-favorite"
-                         @click="cancelFavorite(book.bookId)"
-                    >
-
-                        <el-icon>
-                            <StarFilled/>
-                        </el-icon>
-
-                    </div>
-
-                    <p class="name">{{ book.bookName }}</p>
-
-                    <div class="item">
-                        <p>阅读进度:</p>
-
-                        <div class="detail_item_content">
-                            <p>{{ book.lastRead == 0 ? 0 : book.page }} / {{ book.totalPage }} 页</p>
-
-                            <el-progress
-                                :text-inside="true"
-                                :stroke-width="15"
-                                :format="num => `${num == 0 ? '0' : num.toFixed(2)}%`"
-                                :percentage="book.lastRead == 0 ? 0 : (book.page / book.totalPage * 100)"
-                            />
-
-                        </div>
-
-                    </div>
-
-                    <div class="item">
-                        <p>阅读时间:</p>
-                        <p>{{ readCost(book.readingCost) }}</p>
-                    </div>
-
-                    <div class="item">
-                        <p>上次阅读:</p>
-                        <p>{{
-                                book.lastRead == 0 ? '未阅读' : getLastRead(book.lastRead)
-                            }}</p>
-                    </div>
-
-
-                </div>
+              <el-progress
+                  :text-inside="true"
+                  :stroke-width="15"
+                  :format="num => `${num == 0 ? '0' : num.toFixed(2)}%`"
+                  :percentage="book.lastRead == 0 ? 0 : (book.page / book.totalPage * 100)"
+              />
 
             </div>
 
+          </div>
+
+          <div class="item">
+            <p>阅读时间:</p>
+            <p>{{ readCost(book.readingCost) }}</p>
+          </div>
+
+          <div class="item">
+            <p>上次阅读:</p>
+            <p>{{
+                book.lastRead == 0 ? '未阅读' : getLastRead(book.lastRead)
+              }}</p>
+          </div>
+
+
         </div>
 
-
-        <el-pagination
-            v-model:current-page="page"
-            v-model:page-size="pageSize"
-            layout="prev, pager, next, jumper"
-            :page-count="totalPage"
-            @current-change="jumpToPage"
-            hide-on-single-page
-        />
+      </div>
 
     </div>
+
+
+    <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="pageSize"
+        layout="prev, pager, next, jumper"
+        :page-count="totalPage"
+        @current-change="jumpToPage"
+        hide-on-single-page
+    />
+
+  </div>
 
 
 </template>
@@ -113,6 +113,7 @@ import {MostlyCloudy, StarFilled} from "@element-plus/icons-vue";
 import {popErr, popSuccess} from "../../utils/message.ts";
 import {loadingStore} from "../../store/loading.ts";
 import hotkeys from "hotkeys-js";
+import windowSizeListener from "../../utils/windowSize.ts";
 
 const bookList = ref(new Array<FavoriteBookInfo>());
 const page = ref(1);
@@ -124,115 +125,129 @@ const tags = ref<BookTag[]>([]);
 const empty = ref(false);
 const loading = loadingStore();
 
+// 监听窗口大小变化，修改 pageSize
+windowSizeListener.on((width, height) => {
+  let curPageSize = 12;
+  if (height < 500) {
+    curPageSize = 4;
+  } else if (height <= 900) {
+    curPageSize = 9;
+  }
+  if (pageSize.value != curPageSize) {
+    pageSize.value = curPageSize;
+    getBookList();
+  }
+})
+
 function getBookList() {
 
-    loading.show();
+  loading.show();
 
-    getFavoriteBookListAPi(page.value, pageSize.value)
-        .then((bookInfoList: FavoriteBookList) => {
+  getFavoriteBookListAPi(page.value, pageSize.value)
+      .then((bookInfoList: FavoriteBookList) => {
 
-            empty.value = (bookInfoList.totalPage == 0);
+        empty.value = (bookInfoList.totalPage == 0);
 
-            totalPage.value = bookInfoList.totalPage;
-            bookList.value = bookInfoList.content;
-        })
-        .finally(() => {
-            loading.hide();
-        });
+        totalPage.value = bookInfoList.totalPage;
+        bookList.value = bookInfoList.content;
+      })
+      .finally(() => {
+        loading.hide();
+      });
 }
 
 
 function toBookPage(book: FavoriteBookInfo) {
 
-    setTimeout(() => {
+  setTimeout(() => {
 
-        router.push({
-            name: "Read",
-            query: {
-                "bookId": book.bookId,
-                "remotePage": book.page,
-                "favorite": "true",
-            }
-        }).then();
+    router.push({
+      name: "Read",
+      query: {
+        "bookId": book.bookId,
+        "remotePage": book.page,
+        "favorite": "true",
+      }
+    }).then();
 
-        // 动画时间
-    }, 200)
+    // 动画时间
+  }, 200)
 }
 
 function jumpToPage(pageIdx: number) {
 
-    console.log(`pageIdx = ${pageIdx}, totalPage = ${totalPage.value}, page = ${page.value}`);
+  console.log(`pageIdx = ${pageIdx}, totalPage = ${totalPage.value}, page = ${page.value}`);
 
-    if (pageIdx < 1 || (totalPage.value != 0 && pageIdx > totalPage.value)) {
-        return;
-    }
-    page.value = pageIdx;
-    getBookList();
+  if (pageIdx < 1 || (totalPage.value != 0 && pageIdx > totalPage.value)) {
+    return;
+  }
+  page.value = pageIdx;
+  getBookList();
 }
 
 function cancelFavorite(bookId: number) {
-    delFavoriteApi(bookId)
-        .then(() => {
-            popSuccess("取消收藏");
-        })
-        .catch((() => {
-            popErr("取消收藏失败")
-        }))
-        .finally(() => {
-            getBookList();
-        })
+  delFavoriteApi(bookId)
+      .then(() => {
+        popSuccess("取消收藏");
+      })
+      .catch((() => {
+        popErr("取消收藏失败")
+      }))
+      .finally(() => {
+        getBookList();
+      })
 }
 
 function getLastRead(lastReadTime: number) {
-    const daysDifference = moment().diff(moment(lastReadTime), 'days');
+  const daysDifference = moment().diff(moment(lastReadTime), 'days');
 
-    switch (daysDifference) {
-        case 0:
-            return "今天";
-        case 1:
-            return "昨天";
-        default:
-            return daysDifference + "天前";
-    }
+  switch (daysDifference) {
+    case 0:
+      return "今天";
+    case 1:
+      return "昨天";
+    default:
+      return daysDifference + "天前";
+  }
 }
 
 function readCost(minutes: number): string {
-    minutes = Math.floor(minutes / 60);
-    if (minutes < 60) {
-        return `${minutes} 分钟`
-    }
-    let hour = Math.floor(minutes / 60);
-    let minute = Math.floor(minutes % 60);
-    if (minute == 0) {
-        return `${hour} 小时`
-    }
-    return `${hour} 小时 ${minute} 分钟`;
+  minutes = Math.floor(minutes / 60);
+  if (minutes < 60) {
+    return `${minutes} 分钟`
+  }
+  let hour = Math.floor(minutes / 60);
+  let minute = Math.floor(minutes % 60);
+  if (minute == 0) {
+    return `${hour} 小时`
+  }
+  return `${hour} 小时 ${minute} 分钟`;
 }
 
 function enter() {
 
-    hotkeys('left, a, s, page up', 'favorite', () => jumpToPage(page.value - 1));
-    hotkeys('right, f, d, page down', 'favorite', () => jumpToPage(page.value + 1));
-    hotkeys.setScope('favorite');
+  hotkeys('left, a, s, page up', 'favorite', () => jumpToPage(page.value - 1));
+  hotkeys('right, f, d, page down', 'favorite', () => jumpToPage(page.value + 1));
+  hotkeys.setScope('favorite');
 
-    // 获取书籍标签
-    getAllTag().then(res => {
-        for (let tag of res) {
-            tagMap.set(tag.id, tag);
-        }
-        tags.value = res;
-    });
+  // 获取书籍标签
+  getAllTag().then(res => {
+    for (let tag of res) {
+      tagMap.set(tag.id, tag);
+    }
+    tags.value = res;
+  });
 
-    getBookList();
+  getBookList();
 }
 
 function leave() {
-    hotkeys.deleteScope('favorite');
+  hotkeys.deleteScope('favorite');
 }
 
 defineExpose({
-    'enter': enter,
-    'leave': leave,
+  'enter': enter,
+  'leave': leave,
 })
 
 </script>
