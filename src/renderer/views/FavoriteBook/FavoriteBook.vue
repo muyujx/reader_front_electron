@@ -137,7 +137,7 @@ windowSizeListener.on((width, height) => {
     pageSize.value = curPageSize;
     getBookList();
   }
-})
+});
 
 function getBookList() {
 

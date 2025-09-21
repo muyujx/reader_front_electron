@@ -6,7 +6,7 @@
   display: flex;
   justify-content: center;
   align-items: start;
-  padding-top: 100px;
+  padding-top: 5vh;
 }
 
 .config-content {
@@ -14,9 +14,24 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: auto;
+  max-height: 90vh;
 
   width: 700px;
   padding: 20px;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 100%;
+    border-radius: 10px;
+    background-color: var(--active);
+    border: 1px solid var(--active);
+    background-clip: padding-box;
+  }
 
   .config-item {
     width: 100%;
@@ -166,5 +181,14 @@
     margin: 0;
     width: 150px;
     line-height: 30px;
+  }
+}
+
+// --------------------
+// 不同屏幕大小适配
+// --------------------
+@media (max-height: 900px) {
+  .config-content {
+    //scale: .9;
   }
 }
