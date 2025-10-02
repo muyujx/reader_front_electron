@@ -7,7 +7,6 @@ import {addReadingCostApi} from "../../apis/favoriteBook.ts";
 export function recordReadingTime(bookId: number) {
     // 开始时间
     let start = Date.now() / 1000;
-
     // 小于 10 秒不记录
     const minTime = 10;
 
@@ -56,7 +55,6 @@ export function recordReadingTime(bookId: number) {
     }
 
     const intervalId = setInterval(updateCostFunc, 10 * 1000);
-
 
     onBeforeUnmount(() => {
         clearInterval(intervalId);
