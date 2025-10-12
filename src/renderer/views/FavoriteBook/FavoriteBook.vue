@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import {addHost} from "../../apis/request.ts";
-import {ref} from "vue";
+import {onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {BookTag} from "../../model/bookTag.ts";
 import {getAllTag} from "../../apis/bookTag.ts";
@@ -113,7 +113,7 @@ import {MostlyCloudy, StarFilled} from "@element-plus/icons-vue";
 import {popErr, popSuccess} from "../../utils/message.ts";
 import {loadingStore} from "../../store/loading.ts";
 import hotkeys from "hotkeys-js";
-import windowSizeListener from "../../utils/windowSize.ts";
+import windowSizeListener from "../../service/windowSize.ts";
 
 const bookList = ref(new Array<FavoriteBookInfo>());
 const page = ref(1);
@@ -126,7 +126,9 @@ const empty = ref(false);
 const loading = loadingStore();
 
 // 监听窗口大小变化，修改 pageSize
-windowSizeListener.on((width, height) => {
+const onWindowSizeChange = (width, height) => {
+
+
   let curPageSize = 12;
   if (height < 500) {
     curPageSize = 4;
@@ -137,7 +139,12 @@ windowSizeListener.on((width, height) => {
     pageSize.value = curPageSize;
     getBookList();
   }
-});
+};
+windowSizeListener.on(onWindowSizeChange);
+onUnmounted(() => {
+  console.log("----- FavoriteBook Unmounted ---");
+  windowSizeListener.delete(onWindowSizeChange);
+})
 
 function getBookList() {
 
@@ -225,6 +232,7 @@ function readCost(minutes: number): string {
 }
 
 function enter() {
+  console.log("--- FavoriteBook Page Enter ----");
 
   hotkeys('left, a, s, page up', 'favorite', () => jumpToPage(page.value - 1));
   hotkeys('right, f, d, page down', 'favorite', () => jumpToPage(page.value + 1));
@@ -242,6 +250,7 @@ function enter() {
 }
 
 function leave() {
+  console.log("--- FavoriteBook Page Leave ----");
   hotkeys.deleteScope('favorite');
 }
 
