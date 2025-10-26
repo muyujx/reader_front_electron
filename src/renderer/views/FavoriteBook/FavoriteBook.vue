@@ -1,6 +1,5 @@
 <template>
 
-
   <div class="favorite">
 
     <div class="empty-notify"
@@ -22,7 +21,6 @@
            :content="book.bookName"
            v-for="book in bookList"
            :key="book.bookId"
-
       >
 
         <div class="cover"
@@ -108,12 +106,13 @@ import {BookTag} from "../../model/bookTag.ts";
 import {getAllTag} from "../../apis/bookTag.ts";
 import {delFavoriteApi, getFavoriteBookListAPi} from "../../apis/favoriteBook.ts";
 import {FavoriteBookInfo, FavoriteBookList} from "../../model/favoriteBook.ts";
-import moment from "moment";
 import {MostlyCloudy, StarFilled} from "@element-plus/icons-vue";
 import {popErr, popSuccess} from "../../utils/message.ts";
 import {loadingStore} from "../../store/loading.ts";
 import hotkeys from "hotkeys-js";
 import windowSizeListener from "../../service/windowSize.ts";
+import {formatDistanceToNow, formatDistanceToNowStrict} from 'date-fns';
+import {zhCN} from 'date-fns/locale';
 
 const bookList = ref(new Array<FavoriteBookInfo>());
 const page = ref(1);
@@ -126,9 +125,7 @@ const empty = ref(false);
 const loading = loadingStore();
 
 // 监听窗口大小变化，修改 pageSize
-const onWindowSizeChange = (width, height) => {
-
-
+const onWindowSizeChange = (width: number, height: number) => {
   let curPageSize = 12;
   if (height < 500) {
     curPageSize = 4;
@@ -205,17 +202,12 @@ function cancelFavorite(bookId: number) {
       })
 }
 
-function getLastRead(lastReadTime: number) {
-  const daysDifference = moment().diff(moment(lastReadTime), 'days');
-
-  switch (daysDifference) {
-    case 0:
-      return "今天";
-    case 1:
-      return "昨天";
-    default:
-      return daysDifference + "天前";
-  }
+function getLastRead(lastReadTime: number): string {
+  return formatDistanceToNow(new Date(lastReadTime),
+      {
+        addSuffix: true,
+        locale: zhCN,
+      });
 }
 
 function readCost(minutes: number): string {

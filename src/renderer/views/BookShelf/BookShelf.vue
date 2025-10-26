@@ -33,8 +33,6 @@
 
         </div>
 
-<!--        <div>-->
-
             <Tags
                 ref="tagsComp"
                 :tags="tags"
@@ -108,8 +106,6 @@
                 </el-popover>
 
             </div>
-
-<!--        </div>-->
 
         <el-pagination
             v-model:current-page="page"

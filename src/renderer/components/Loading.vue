@@ -13,9 +13,7 @@
             </div>
         </div>
 
-
     </Transition>
-
 
 </template>
 

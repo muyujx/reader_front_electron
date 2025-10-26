@@ -1,109 +1,109 @@
 <template>
 
-    <div class="page_view">
+  <div class="page_view">
 
-        <Contents ref="contents"
-                  :book-id="bookId"
-                  :book-name="bookInfo.bookName"
-                  @skip-chapter="getPageHtml"
-                  @skip-cover-page="getPageHtml(PageCache.COVER_PAGE)"
-                  @open="showContents = true"
-                  @close="showContents = false"
-        />
+    <Contents ref="contents"
+              :book-id="bookId"
+              :book-name="bookInfo.bookName"
+              @skip-chapter="getPageHtml"
+              @skip-cover-page="getPageHtml(PageCache.COVER_PAGE)"
+              @open="showContents = true"
+              @close="showContents = false"
+    />
 
-        <div class="page_container"
-             @touchstart.stop="touchControl.touchstart"
-             @touchmove.stop="touchControl.touchmove"
-             @touchend.stop="touchControl.touchend"
-             @click="toggleFooter"
-             ref="pageContainer"
-             :class="{
+    <div class="page_container"
+         @touchstart.stop="touchControl.touchstart"
+         @touchmove.stop="touchControl.touchmove"
+         @touchend.stop="touchControl.touchend"
+         @click="toggleFooter"
+         ref="pageContainer"
+         :class="{
                     'show_contents': showContents
                 }"
+    >
+
+
+      <div class="book_cover"
+           :style="{backgroundImage: 'url(' + addHost(bookInfo.bigCoverPic) + ')'}"
+           v-if="curPageItem.page === PageCache.COVER_PAGE">
+      </div>
+
+      <template v-else>
+
+
+        <div class="page_content"
+
         >
 
+          <div class="page_indicator">
+            <p class="page_title">{{ curPageItem.title ?? '' }}</p>
+            <div class="page_number">
 
-            <div class="book_cover"
-                 :style="{backgroundImage: 'url(' + addHost(bookInfo.bigCoverPic) + ')'}"
-                 v-if="curPageItem.page === PageCache.COVER_PAGE">
+              <input
+                  type="number"
+                  :value="curPageItem.page"
+                  maxlength="4"
+                  min="1"
+                  :max="totalPage"
+                  @change="getPageHtml($event.target.value)"/>
+
+              <p>/{{ totalPage }} 页</p>
             </div>
+          </div>
 
-            <template v-else>
-
-
-                <div class="page_content"
-
-                >
-
-                    <div class="page_indicator">
-                        <p class="page_title">{{ curPageItem.title ?? '' }}</p>
-                        <div class="page_number">
-
-                            <input
-                                type="number"
-                                :value="curPageItem.page"
-                                maxlength="4"
-                                min="1"
-                                :max="totalPage"
-                                @change="getPageHtml($event.target.value)"/>
-
-                            <p>/{{ totalPage }} 页</p>
-                        </div>
-                    </div>
-
-                    <div class="raw_page" ref="rawPage" id="raw_page"
-                         @click="rawPageClick"
-                         v-html="curPageItem.content"
-                         :style="{
+          <div class="raw_page" ref="rawPage" id="raw_page"
+               @click="rawPageClick"
+               v-html="curPageItem.content"
+               :style="{
                             'scale': 1 +  scale.current / 100,
                             'margin-top': scale.current - 50 * (1 -  scale.current / 20) + 'px'
                          }"
-                    ></div>
+          ></div>
 
 
-                    <div class="page_bottom"
-                         v-if="showClock">
-                        <Clock/>
-                    </div>
-
-                </div>
-
-
-            </template>
-
+          <div class="page_bottom"
+               v-if="showClock">
+            <Clock/>
+          </div>
 
         </div>
 
 
-        <el-image-viewer
-            v-if="imageViewer"
-            :url-list="previewList"
-            :hide-on-click-modal="true"
-            @close="imageViewerClose"
-        />
+      </template>
+
+
     </div>
 
 
-    <ViewFooterBar v-show="showFooter"
-                   @open-contents="openContents"
+    <el-image-viewer
+        v-if="imageViewer"
+        :url-list="previewList"
+        :hide-on-click-modal="true"
+        @close="imageViewerClose"
     />
+  </div>
 
-    <el-dialog
-        class="page_confirm"
-        v-model="pageConfirm"
-        :show-close="false"
-        center
-        width="500"
-    >
-        <span>本地进度为 {{ pageConfirmLocal }} 页, 远程进度为 {{ pageConfirmRemote }} 页</span>
-        <span> 请选择要保留的进度 </span>
-        <template #footer>
-            <div class="page_confirm_footer">
-                <el-button @click="pageConfirm = false; updateRemotePage(bookId,pageConfirmLocal)">本地</el-button>
-                <el-button @click="pageConfirm = false; getPageHtml(pageConfirmRemote)">远程</el-button>
-            </div>
-        </template>
-    </el-dialog>
+
+  <ViewFooterBar v-show="showFooter"
+                 @open-contents="openContents"
+  />
+
+  <el-dialog
+      class="page_confirm"
+      v-model="pageConfirm"
+      :show-close="false"
+      center
+      width="500"
+  >
+    <span>本地进度为 {{ pageConfirmLocal }} 页, 远程进度为 {{ pageConfirmRemote }} 页</span>
+    <span> 请选择要保留的进度 </span>
+    <template #footer>
+      <div class="page_confirm_footer">
+        <el-button @click="pageConfirm = false; updateReadProgress(bookId,pageConfirmLocal)">本地</el-button>
+        <el-button @click="pageConfirm = false; getPageHtml(pageConfirmRemote)">远程</el-button>
+      </div>
+    </template>
+  </el-dialog>
 
 
 </template>
@@ -126,9 +126,9 @@ import {ScreenResizeListener} from "./fullScreenListener";
 import Clock from "../../components/Clock.vue";
 import {scaleStore} from "../../store/scale";
 import ViewFooterBar from "../../components/ViewFooterBar.vue";
-import {getRemotePage, updateRemotePage} from "../../apis/userRemotePage";
+import {getRemotePage} from "../../apis/userRemotePage";
 import {addHost} from "../../apis/request.ts";
-import {recordReadingTime} from "./pageView.ts";
+import {recordReadingProgress, updateReadProgress} from "./pageView.ts";
 
 // 是否显示底部时间
 const showClock = ref(false);
@@ -144,11 +144,11 @@ const showContents = ref(false);
 // 判断是否全屏
 const screeResize = new ScreenResizeListener();
 screeResize.addListener((full: boolean) => {
-    showClock.value = full;
+  showClock.value = full;
 });
 
 onMounted(() => {
-    pageType.current = PageType.PAGE_VIEW;
+  pageType.current = PageType.PAGE_VIEW;
 });
 
 
@@ -159,13 +159,13 @@ const totalPage = ref(0);
 const curPageItem = ref<PageItem>(PageCache.BLANK_PAGE_ITEM);
 
 const bookInfo = ref<BookInfo>({
-    bigCoverPic: "",
-    tagId: 0,
-    bookName: '',
-    totalPage: 1,
-    coverPic: '',
-    bookId: 0,
-    favorite: false,
+  bigCoverPic: "",
+  tagId: 0,
+  bookName: '',
+  totalPage: 1,
+  coverPic: '',
+  bookId: 0,
+  favorite: false,
 });
 
 // 图片预览列表
@@ -181,55 +181,50 @@ const isFavorite = route.query.favorite == "true";
 
 // 找不到有效的 bookId 跳回到书籍列表
 if (bookIdStr == null || isNaN(parseInt(bookIdStr))) {
-    router.push({
-            name: "Home"
-        }
-    );
+  router.push({
+        name: "Home"
+      }
+  );
 }
 bookId = parseInt(bookIdStr);
-
-if (isFavorite) {
-    // 记录阅读时间
-    recordReadingTime(bookId);
-}
 
 // 页面缓存
 const pageCache = new PageCache(bookId);
 
 // 获取书籍信息
 getBookInfo(bookId).then((resBookInfo: BookInfo) => {
-    bookInfo.value = resBookInfo;
-    // 设置一下 bookId, 接口没有返回 bookId
-    bookInfo.value.bookId = bookId;
-    // 将 totalPage
-    totalPage.value = resBookInfo.totalPage;
-    // 更新 totalPage
-    pageCache.setTotalPage(totalPage.value);
+  bookInfo.value = resBookInfo;
+  // 设置一下 bookId, 接口没有返回 bookId
+  bookInfo.value.bookId = bookId;
+  // 将 totalPage
+  totalPage.value = resBookInfo.totalPage;
+  // 更新 totalPage
+  pageCache.setTotalPage(totalPage.value);
 });
 
 // 快速选择页面中的图片
 function imageSelect(e: any) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (imageViewer.value) {
-        imageViewer.value = false;
-        return;
-    }
+  if (imageViewer.value) {
+    imageViewer.value = false;
+    return;
+  }
 
-    let imageList = document.querySelectorAll("#raw_page img");
-    let srcList = new Array<string>();
-    // @ts-ignore
-    for (let img of imageList) {
-        let src = img.attributes.getNamedItem("src");
-        if (src instanceof Attr && src.value != null) {
-            srcList.push(src.value);
-        }
+  let imageList = document.querySelectorAll("#raw_page img");
+  let srcList = new Array<string>();
+  // @ts-ignore
+  for (let img of imageList) {
+    let src = img.attributes.getNamedItem("src");
+    if (src instanceof Attr && src.value != null) {
+      srcList.push(src.value);
     }
+  }
 
-    if (srcList.length != 0) {
-        previewList.value = srcList;
-        imageViewer.value = true;
-    }
+  if (srcList.length != 0) {
+    previewList.value = srcList;
+    imageViewer.value = true;
+  }
 }
 
 hotkeys('left, a, s, page up', 'page-view', prePage);
@@ -238,14 +233,14 @@ hotkeys('w', 'page-view', imageSelect);
 hotkeys.setScope('page-view');
 // console.log(hotkeys.getAllKeyCodes());
 onBeforeUnmount(() => {
-    hotkeys.deleteScope('page-view');
+  hotkeys.deleteScope('page-view');
 });
 
 /**
  * 关闭图片预览
  */
 function imageViewerClose() {
-    imageViewer.value = false;
+  imageViewer.value = false;
 }
 
 /**
@@ -253,31 +248,31 @@ function imageViewerClose() {
  * @param event
  */
 function rawPageClick(event: any) {
-    const target = event.target;
-    if (target.src != undefined) {
-        previewList.value = [target.src];
-        imageViewer.value = true;
-    }
+  const target = event.target;
+  if (target.src != undefined) {
+    previewList.value = [target.src];
+    imageViewer.value = true;
+  }
 }
 
 /**
  * 下一页
  */
 function nextPage() {
-    if (imageViewer.value) {
-        return;
-    }
-    getPageHtml(curPageItem.value.page + 1);
+  if (imageViewer.value) {
+    return;
+  }
+  getPageHtml(curPageItem.value.page + 1);
 }
 
 /**
  * 上一页
  */
 function prePage() {
-    if (imageViewer.value) {
-        return;
-    }
-    getPageHtml(curPageItem.value.page - 1);
+  if (imageViewer.value) {
+    return;
+  }
+  getPageHtml(curPageItem.value.page - 1);
 }
 
 const pageContainer = ref();
@@ -288,7 +283,7 @@ addPopover(curPageItem);
 
 let mounted = false;
 onMounted(() => {
-    mounted = true;
+  mounted = true;
 });
 
 
@@ -296,102 +291,80 @@ const pageConfirm = ref(false);
 const pageConfirmRemote = ref(0);
 const pageConfirmLocal = ref(0);
 
-let updateInterval = -1;
-
-onBeforeUnmount(() => {
-    if (updateInterval == -1) {
-        return;
-    }
-    clearInterval(updateInterval);
-    // 推出前更新当前页
-    updateRemotePage(bookId, curPageItem.value.page);
-});
-
-
 async function initPage(bookId: number) {
-    let localPage = getLocalStorageInt(bookId, PageCache.COVER_PAGE);
-    // 获取服务端书页进度
-    let remotePage = await getRemotePage(bookId);
+  let localPage = getLocalStorageInt(bookId, PageCache.COVER_PAGE);
+  // 获取服务端书页进度
+  let remotePage = await getRemotePage(bookId);
 
-    // -1 说明没有收藏该书, 不记录该书的进度
-    if (remotePage == -1) {
-        getPageHtml(localPage);
-        return;
-    }
+  // -1 说明没有收藏该书, 不记录该书的进度
+  if (remotePage == -1) {
+    getPageHtml(localPage);
+    return;
+  }
 
-    let resPage = localPage;
-    // 存在远程进度, 还是先获取本地进度书页
-    getPageHtml(resPage);
+  // 存在远程进度, 还是先获取本地进度书页
+  getPageHtml(localPage);
 
-    updateInterval = setInterval(() => {
-
-        if (resPage != curPageItem.value.page) {
-            resPage = curPageItem.value.page;
-            console.log(`---------- remote update bookId = ${bookId}, page = ${resPage} ---------`);
-            updateRemotePage(bookId, resPage);
-        }
-    }, 5 * 1000);
-
-
-    if (remotePage != localPage) {
-        // 服务端进度和本地进度不一致, 手动确认要保留的进度
-        // 默认使用 本地进度，手动选择远程进度后切换为远程进度
-        pageConfirmLocal.value = localPage;
-        pageConfirmRemote.value = remotePage;
-        pageConfirm.value = true;
-    }
+  if (remotePage != localPage) {
+    // 服务端进度和本地进度不一致, 手动确认要保留的进度
+    // 默认使用 本地进度，手动选择远程进度后切换为远程进度
+    pageConfirmLocal.value = localPage;
+    pageConfirmRemote.value = remotePage;
+    pageConfirm.value = true;
+  }
 }
 
 initPage(bookId);
-
+// 记录阅读进度
+recordReadingProgress(bookId, curPageItem, pageConfirm);
 
 function getPageHtml(curPage: number) {
 
-    if (curPage <= PageCache.COVER_PAGE) {
-        if (PageCache.COVER_PAGE != curPageItem.value.page) {
-            curPageItem.value = PageCache.COVER_PAGE_ITEM;
+  if (curPage <= PageCache.COVER_PAGE) {
+    if (PageCache.COVER_PAGE != curPageItem.value.page) {
+      curPageItem.value = PageCache.COVER_PAGE_ITEM;
 
-            // 同步修改当前页所在目录
-            contents?.value?.changePage(PageCache.COVER_PAGE);
+      // 同步修改当前页所在目录
+      contents?.value?.changePage(PageCache.COVER_PAGE);
 
-            // 记录上一次获取的页面
-            setLocalStorage(bookId, PageCache.COVER_PAGE);
-        }
-        return;
+      // 记录上一次获取的页面
+      setLocalStorage(bookId, PageCache.COVER_PAGE);
     }
+    return;
+  }
 
-    // totalPage = 0 是书籍总页数还没有获取到时
-    if (totalPage.value > 0 && curPage > totalPage.value) {
-        curPage = totalPage.value;
+  // totalPage = 0 是书籍总页数还没有获取到时
+  if (totalPage.value > 0 && curPage > totalPage.value) {
+    curPage = totalPage.value;
+  }
+
+  if (curPage < PageCache.FIRST_PAGE) {
+    curPage = PageCache.FIRST_PAGE;
+  }
+
+  // page 没有变更
+  if (curPage == curPageItem.value.page) {
+    return;
+  }
+
+  // 没挂载前不能操作 DOM 元素
+  if (mounted) {
+    pageContainer.value.scrollTop = 0;
+  }
+
+  pageCache.getPage(curPage).then((pageItem: PageItem | null) => {
+    // 多次重复获取不操作直接返回
+    if (pageItem == null) {
+      return;
     }
+    curPageItem.value = pageItem;
 
-    if (curPage < PageCache.FIRST_PAGE) {
-        curPage = PageCache.FIRST_PAGE;
-    }
+    // 同步修改当前页所在目录
+    contents?.value?.changePage(pageItem.page);
 
-    // page 没有变更
-    if (curPage == curPageItem.value.page) {
-        return;
-    }
-
-    // 没挂载前不能操作 DOM 元素
-    if (mounted) {
-        pageContainer.value.scrollTop = 0;
-    }
-
-    pageCache.getPage(curPage).then((pageItem: PageItem | null) => {
-        // 多次重复获取不操作直接返回
-        if (pageItem == null) {
-            return;
-        }
-        curPageItem.value = pageItem;
-
-        // 同步修改当前页所在目录
-        contents?.value?.changePage(pageItem.page);
-
-        // 记录上一次获取的页面
-        setLocalStorage(bookId, curPage);
-    })
+    // 记录上一次获取的页面
+    setLocalStorage(bookId, curPage);
+  })
 }
 
 const touchControl = new TouchControl();
@@ -399,14 +372,14 @@ touchControl.onSwipeLeft(nextPage);
 touchControl.onSwipeRight(prePage);
 
 function toggleFooter() {
-    showFooter.value = !showFooter.value;
+  showFooter.value = !showFooter.value;
 }
 
 const contents = useTemplateRef<InstanceType<typeof Contents>>("contents");
 
 function openContents() {
-    showFooter.value = false;
-    contents?.value?.show();
+  showFooter.value = false;
+  contents?.value?.show();
 }
 
 </script>

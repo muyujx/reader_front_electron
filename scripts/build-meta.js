@@ -1,10 +1,10 @@
 // scripts/gen-env.js
 const fs = require('fs');
 const path = require('path');
-const moment = require('moment');
+const {format} = require('date-fns');
 
 const version = require('../package.json').version;
-const buildTime = moment().format("YYYY-MM-DD HH:mm:ss");
+const buildTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
 const content = [
     `VITE_APP_VERSION=${version}`,

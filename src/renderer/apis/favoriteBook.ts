@@ -41,17 +41,3 @@ export function delFavoriteApi(bookId: number) {
     });
 }
 
-/**
- * 增加书籍阅读时间
- * @param bookId 书籍 id
- * @param readingCost 阅读耗时 单位 s
- */
-export function addReadingCostApi(bookId: number, readingCost: number) {
-    return rq.post({
-        url: `/api/favorite/read_cost`,
-        body: {
-            bookId,
-            readingCost
-        }
-    });
-}

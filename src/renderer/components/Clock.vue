@@ -8,15 +8,13 @@
 
 
 <script setup lang="ts">
-
+import { format } from 'date-fns';
 import {ref} from "vue";
-import moment from "moment";
-
 
 const timeStr = ref(getTime());
 
 function getTime(): string {
-    return moment().format("HH:mm");
+    return format(new Date(), 'HH:mm');
 }
 
 setInterval(() => {
