@@ -17,7 +17,8 @@ import {
     getFirstUndownloadedPageIdx,
     batchMarkPageDownloaded,
     getAllBooks,
-    updateBookReadProgress
+    updateBookReadProgress,
+    getBooksByPage
 } from "./dbService";
 import { httpPost } from "./request";
 import axios from "axios";
@@ -280,6 +281,42 @@ export function initBookDownloadIpc(): void {
         });
         
         return booksWithProgress;
+        return booksWithProgress;
+    });
+
+    /**
+     * 分页获取已下载的书籍列表
+     */
+    ipcMain.handle(ipcChannel.bookGetListByPage, async (event: any, { page, pageSize }: { page: number, pageSize: number }) => {
+        await initDb();
+        const result = getBooksByPage(page, pageSize);
+        
+        // 为每本书添加下载进度信息
+        const booksWithProgress = result.content.map((book: any) => {
+            const downloadedPages = getDownloadedPageCount(book.book_id);
+            const totalPage = book.total_page;
+            return {
+                bookId: book.book_id,
+                bookName: book.book_name,
+                totalPage: totalPage,
+                coverPic: book.cover_pic,
+                bigCoverPic: book.big_cover_pic,
+                tagId: book.tag_id,
+                createTime: book.create_time,
+                downloadedPages,
+                progress: totalPage > 0 ? Math.floor((downloadedPages / totalPage) * 100) : 0,
+                // 添加阅读进度相关字段
+                readPage: book.read_page || 0,
+                lastRead: book.last_read_time || 0,
+                readingCost: book.reading_cost || 0
+            };
+        });
+        
+        return {
+            content: booksWithProgress,
+            total: result.total,
+            totalPage: Math.ceil(result.total / pageSize) || 1
+        };
     });
 
     /**
@@ -563,7 +600,7 @@ async function resumeDownloadPages(event: any, bookInfo: BookInfo): Promise<void
         // 从第一个未下载页面开始，每5页一批获取
         while (startPage <= totalPage) {
             // 检查是否暂停
-            while (downloadingBooks.has(bookId) === false) {
+            while (!downloadingBooks.has(bookId)) {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 if (!downloadingBooks.has(bookId) && !downloadingBooks.has(-bookId)) {
                     console.log(`[Download] Cancelled: ${bookId}`);

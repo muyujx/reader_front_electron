@@ -652,3 +652,42 @@ export function getFirstUndownloadedPageIdx(bookId: number): number {
     stmt.free();
     return pageIdx;
 }
+
+
+/**
+ * 分页查询书籍列表
+ * 
+ * @param page 当前页码（从 1 开始）
+ * @param pageSize 每页数量
+ * @returns 书籍列表和总数
+ */
+export function getBooksByPage(page: number, pageSize: number): { content: any[], total: number } {
+    if (!db) {
+        console.warn('[DB] Database not initialized');
+        return { content: [], total: 0 };
+    }
+
+    // 获取总数
+    let total = 0;
+    const countStmt = db.prepare('SELECT COUNT(*) as count FROM book');
+    if (countStmt.step()) {
+        const row = countStmt.getAsObject();
+        total = row.count as number;
+    }
+    countStmt.free();
+
+    // 计算偏移量
+    const offset = (page - 1) * pageSize;
+
+    // 分页查询
+    const results: any[] = [];
+    const stmt = db.prepare('SELECT * FROM book ORDER BY create_time DESC LIMIT ? OFFSET ?');
+    stmt.bind([pageSize, offset]);
+
+    while (stmt.step()) {
+        results.push(stmt.getAsObject());
+    }
+
+    stmt.free();
+    return { content: results, total };
+}

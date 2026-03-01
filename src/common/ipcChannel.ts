@@ -31,7 +31,9 @@ export default {
     bookGetLocalImage: 'book:get-local-image',
 
     // 下载管理
+    // 下载管理
     bookGetAllList: 'book:get-all-list',
+    bookGetListByPage: 'book:get-list-by-page',
 
     // 阅读进度
     bookUpdateReadProgress: 'book:update-read-progress'

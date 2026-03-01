@@ -102,6 +102,19 @@ export function getDownloadedBookList(): Promise<DownloadedBookInfo[]> {
 }
 
 /**
+ * 分页获取已下载的书籍列表
+ */
+export interface DownloadedBookListResult {
+    content: DownloadedBookInfo[];
+    total: number;
+    totalPage: number;
+}
+
+export function getDownloadedBookListByPage(page: number, pageSize: number): Promise<DownloadedBookListResult> {
+    return ipcInvoke(ipcChannel.bookGetListByPage, { page, pageSize });
+ }
+
+ /**
  * 更新本地书籍阅读进度
  * 
  * @param bookId 书籍 ID

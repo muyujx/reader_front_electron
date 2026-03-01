@@ -124,7 +124,7 @@
 <script setup lang="ts">
 import {useTemplateRef, ref} from "vue";
 import {useRouter} from "vue-router";
-import {BookInfo, BookShelfList} from "../../model/pageModel";
+import {BookInfo as ShelfBookInfo, BookShelfList} from "../../model/pageModel";
 import {getBookInfoList} from "../../apis/book";
 import {getLocalStorage, getLocalStorageInt, setLocalStorage} from "../../utils/localStorageUtil";
 import hotkeys from "hotkeys-js";
@@ -141,6 +141,15 @@ import {addFavoriteApi, delFavoriteApi} from "../../apis/favoriteBook.ts";
 import {popErr, popSuccess} from "../../utils/message.ts";
 import {loadingStore} from "../../store/loading.ts";
 import {searchOnType} from "./BookShelf.ts";
+import {
+    downloadBook as downloadBookApi,
+    resumeBookDownload,
+    pauseBookDownload,
+    getDownloadProgress,
+    onDownloadProgress,
+    BookInfo
+} from "../../apis/bookDownload.ts";
+import {CircleCheck} from "@element-plus/icons-vue";
 
 const PAGE_LIST_INDEX = "page_list_index";
 const PAGE_TAG_LOCAL = "page_tag_local";

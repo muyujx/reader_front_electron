@@ -1,5 +1,7 @@
 <template>
-    <div class="download">
+
+    <div class="favorite">
+
         <div class="empty-notify"
              :class="{
                 'active': empty
@@ -11,25 +13,33 @@
             <p>还没有下载书籍</p>
         </div>
 
+
         <div class="books">
+            
+
             <div class="book"
                  :content="book.bookName"
                  v-for="book in bookList"
                  :key="book.bookId"
             >
+
                 <div class="cover"
                      @click="toBookPage(book)"
                 >
                     <img :src="addHost(book.coverPic)" :alt="book.bookName"/>
+
                 </div>
 
+
                 <div class="detail">
+
                     <div class="delete-download"
                          @click="deleteBook(book.bookId)"
                     >
                         <el-icon>
                             <Delete/>
                         </el-icon>
+
                     </div>
 
                     <p class="name">{{ book.bookName }}</p>
@@ -52,7 +62,6 @@
                         <p>阅读时间:</p>
                         <p>{{ readCost(book.readingCost) }}</p>
                     </div>
-
                     <div class="item" v-if="book.readPage > 0">
                         <p>上次阅读:</p>
                         <p>{{ book.lastRead == 0 ? '未阅读' : getLastRead(book.lastRead) }}</p>
@@ -76,9 +85,13 @@
                         <p>{{ formatDate(book.createTime) }}</p>
                     </div>
 
+
                 </div>
+
             </div>
+
         </div>
+
 
         <el-pagination
             v-model:current-page="page"
@@ -88,7 +101,9 @@
             @current-change="jumpToPage"
             hide-on-single-page
         />
+
     </div>
+
 </template>
 
 <style scoped lang="less" src="./DownloadBook.less"/>
@@ -105,7 +120,7 @@ import windowSizeListener from "../../service/windowSize.ts";
 import {formatDistanceToNow} from 'date-fns';
 import {zhCN} from 'date-fns/locale';
 import {
-    getDownloadedBookList,
+    getDownloadedBookListByPage,
     deleteLocalBook,
     DownloadedBookInfo
 } from "../../apis/bookDownload.ts";
@@ -139,18 +154,11 @@ onUnmounted(() => {
 
 function getBookList() {
     loading.show();
-    getDownloadedBookList()
-        .then((books: DownloadedBookInfo[]) => {
-            // 计算分页
-            const total = books.length;
-            totalPage.value = Math.ceil(total / pageSize.value) || 1;
-            
-            // 分页处理
-            const start = (page.value - 1) * pageSize.value;
-            const end = start + pageSize.value;
-            bookList.value = books.slice(start, end);
-            
-            empty.value = books.length === 0;
+    getDownloadedBookListByPage(page.value, pageSize.value)
+        .then((result) => {
+            bookList.value = result.content;
+            totalPage.value = result.totalPage;
+            empty.value = result.total === 0;
         })
         .finally(() => {
             loading.hide();
