@@ -52,11 +52,42 @@ async function getCookieHeader() {
     return cookies.map(c => `${c.name}=${c.value}`).join('; ');
 }
 
+/**
+ * 发送 GET 请求（直接调用，不通过 IPC）
+ */
+export async function httpGet(path: string, query?: any): Promise<any> {
+    const url = parseUrl(path);
+    console.debug(`[http] [get] url = ${url}`);
+    return axiosObj.get(url, {
+        params: query,
+        headers: {
+            Cookie: await getCookieHeader()
+        }
+    }).then(res => res.data);
+}
+
+/**
+ * 发送 POST 请求（直接调用，不通过 IPC）
+ */
+export async function httpPost(path: string, body?: any): Promise<any> {
+    const url = parseUrl(path);
+    console.debug(`[http] [post] url = ${url}`);
+    return axiosObj.post(url, body, {
+        headers: {
+            Cookie: await getCookieHeader()
+        }
+    }).then(async (res) => {
+        if (path === loginPath) {
+            await setCookie(res.headers);
+        }
+        return res.data;
+    });
+}
+
 
 export function initRequestIpc() {
 
-    ipcMain.handle(ipcChannel.rqGet, async (event: any, args: GetParam[]) => {
-        const param = args[0];
+    ipcMain.handle(ipcChannel.rqGet, async (event: any, param: GetParam) => {
         const url = parseUrl(param.path);
 
         console.debug(`[http] [get] url = ${url}`);
@@ -72,8 +103,7 @@ export function initRequestIpc() {
 
     });
 
-    ipcMain.handle(ipcChannel.rqPost, async (event: any, args: PostParam[]) => {
-        const param = args[0];
+    ipcMain.handle(ipcChannel.rqPost, async (event: any, param: PostParam) => {
         const url = parseUrl(param.path);
 
         console.debug(`[http] [post] url = ${url}`);

@@ -6,6 +6,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 import proxyConfig from './proxyConfig'
+import config from './config.json'
 
 import *  as Path from 'path';
 import {fileURLToPath} from 'url';
@@ -20,9 +21,17 @@ export default defineConfig({
     publicDir: 'public',
     root: Path.join(__dirname, 'src', 'renderer'),
     envDir: __dirname,
+
+    define: {
+        __DEV_MOD__: JSON.stringify(config.dev_mod),
+        __SERVER_PROD_HOST__: JSON.stringify(config.server_prod_host),
+        __SERVER_DEV_HOST__: JSON.stringify(config.server_dev_host),
+    },
+
     server: {
 
-        port: 9797,
+        port: 5173,
+        host: '0.0.0.0',
 
         proxy: {
             '/api/': {

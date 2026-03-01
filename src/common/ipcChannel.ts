@@ -16,4 +16,23 @@ export default {
     // 网络请求
     rqGet: 'rqGet',
     rqPost: 'rqPost',
+
+    // 书籍下载
+    bookDownload: 'book:download',
+    bookDownloadProgress: 'book:download-progress',
+    bookGetDownloadProgress: 'book:get-download-progress',
+    bookResumeDownload: 'book:resume-download',
+    bookPauseDownload: 'book:pause-download',
+    bookCancelDownload: 'book:cancel-download',
+    bookGetPage: 'book:get-page',
+    bookGetInfo: 'book:get-info',
+    bookIsDownloaded: 'book:is-downloaded',
+    bookDelete: 'book:delete',
+    bookGetLocalImage: 'book:get-local-image',
+
+    // 下载管理
+    bookGetAllList: 'book:get-all-list',
+
+    // 阅读进度
+    bookUpdateReadProgress: 'book:update-read-progress'
 }

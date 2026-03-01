@@ -2,6 +2,7 @@ import {BookInfo, BookShelfList, PageItem} from "../model/pageModel";
 import rq from "./request";
 import {ContentsItem} from "../model/contentsModel";
 import {BookSearchOnTypeItem} from "../model/book.ts";
+import {API_BOOK_PAGE_LIST} from "../../common/hostConfig";
 
 /**
  * 获取书籍列表
@@ -28,7 +29,7 @@ export function getBookInfoList(page: number, pageSize: number, search: string, 
  */
 export function getBookPageList(bookId: number, startPage: number, pageSize: number): Promise<PageItem[]> {
     return rq.post({
-        url: '/api/book/page/html/page',
+        url: API_BOOK_PAGE_LIST,
         body: {
             bookId,
             startPage,

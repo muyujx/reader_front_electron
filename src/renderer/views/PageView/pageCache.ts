@@ -1,6 +1,7 @@
 import {PageItem} from "../../model/pageModel";
 import {getBookPageList} from "../../apis/book";
 import {preloadImage} from "../../service/imagePreLoad";
+import {getLocalPage} from "../../apis/bookDownload";
 
 enum PageCacheLoad {
     // 不操作缓存
@@ -89,12 +90,18 @@ export class PageCache {
     private readonly bookId: number;
 
     /**
+     * 是否使用本地下载的内容
+     */
+    private readonly useLocal: boolean;
+
+    /**
      * 防止重复加载缓存
      */
     private pending = false;
 
-    constructor(bookId: number) {
+    constructor(bookId: number, useLocal: boolean = false) {
         this.bookId = bookId;
+        this.useLocal = useLocal;
     }
 
     public setTotalPage(totalPage: number): void {
@@ -194,8 +201,33 @@ export class PageCache {
 
         startPage = Math.max(startPage, PageCache.FIRST_PAGE);
 
-        // 获取书页
-        const pages = await getBookPageList(this.bookId, startPage, pageSize);
+        let pages: PageItem[];
+        
+        if (this.useLocal) {
+            // 本地模式：优先从本地读取，本地没有的页面从网络获取
+            const remotePages = await getBookPageList(this.bookId, startPage, pageSize);
+            const remotePageMap = new Map<number, PageItem>();
+            for (const page of remotePages) {
+                remotePageMap.set(page.page, page);
+            }
+            
+            pages = [];
+            for (let i = 0; i < pageSize; i++) {
+                const pageNum = startPage + i;
+                if (pageNum > this.totalPage) break;
+                // 优先从本地获取
+                const localPage = await getLocalPage(this.bookId, pageNum);
+                if (localPage) {
+                    pages.push(localPage);
+                } else if (remotePageMap.has(pageNum)) {
+                    // 本地没有则使用网络数据
+                    pages.push(remotePageMap.get(pageNum)!);
+                }
+            }
+        } else {
+            pages = await getBookPageList(this.bookId, startPage, pageSize);
+        }
+        
         if (loadType == PageCacheLoad.RESET) {
             this.cacheList = pages;
         } else if (loadType == PageCacheLoad.PUSH) {

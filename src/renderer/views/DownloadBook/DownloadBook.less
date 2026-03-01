@@ -1,4 +1,4 @@
-.favorite {
+.download {
   width: 100%;
   height: 100%;
 
@@ -13,7 +13,6 @@
 
 .books {
   max-width: 1300px;
-  //background-color: #1E611E;
   height: 900px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(0, 400px));
@@ -38,7 +37,6 @@
     border: 1px solid var(--active);
     background-clip: padding-box;
   }
-
 }
 
 .detail {
@@ -47,12 +45,11 @@
   flex-direction: column;
   justify-content: start;
   align-items: start;
-  //background-color: #3A66D1;
   width: 170px;
   height: 100%;
   position: relative;
 
-  .cancel-favorite {
+  .delete-download {
     position: absolute;
     bottom: -3px;
     right: -3px;
@@ -66,11 +63,11 @@
     border-radius: 10px 0 0 0;
 
     &:hover {
-      color: var(--primary);
+      color: var(--danger);
     }
 
     .el-icon {
-      color: var(--primary);
+      color: var(--danger);
       font-size: 25px;
     }
   }
@@ -84,9 +81,7 @@
     font-size: 12px;
     margin-top: 1px;
 
-
     p:first-child {
-      //background-color: #1E611E;
       width: 60px;
     }
 
@@ -109,92 +104,9 @@
         :deep(.el-progress-bar__innerText) {
           color: var(--foreground);
         }
-
-      }
-
-    }
-
-  }
-
-  .download-book {
-    position: absolute;
-    bottom: -3px;
-    left: -3px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 30px;
-
-    border-radius: 0 10px 0 0;
-
-    &:hover {
-      color: var(--primary);
-    }
-
-    .el-icon {
-      color: var(--primary);
-      font-size: 20px;
-    }
-  }
-
-  .download-progress {
-    position: absolute;
-    bottom: -3px;
-    left: -3px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 30px;
-    box-sizing: border-box;
-
-    border-radius: 0 10px 0 0;
-
-    &.clickable {
-      cursor: pointer;
-      &:hover {
-        opacity: 0.8;
       }
     }
-
-    .el-progress {
-      :deep(.el-progress-circle) {
-        svg {
-          .el-progress-circle__track {
-            stroke: var(--selectBg);
-          }
-          .el-progress-circle__path {
-            stroke: var(--primary);
-          }
-        }
-      }
-    }
-
-    .progress-text {
-      position: absolute;
-      font-size: 11px;
-      font-weight: bold;
-      color: var(--foreground);
-    }
   }
-
-  .download-complete {
-    position: absolute;
-    bottom: -3px;
-    left: -3px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 30px;
-
-    border-radius: 0 10px 0 0;
-  }
-
 
   .name {
     width: 150px;
@@ -208,13 +120,8 @@
     justify-content: center;
     text-align: center;
     text-wrap: wrap;
-
-    //background-color: #1E611E;
   }
-
-
 }
-
 
 .book {
   width: 300px;
@@ -241,7 +148,6 @@
     border: 3px solid transparent;
     transition: all ease 0.5s;
 
-
     img {
       width: 100%;
       height: 100%;
@@ -254,10 +160,8 @@
     &:active {
       transform: scale(0.5);
     }
-
   }
 }
-
 
 .empty-notify {
   display: none;
@@ -270,8 +174,6 @@
   color: var(--primary);
   flex-direction: column;
   margin-top: -50px;
-
-  //background-color: #1E611E;
 
   .el-icon {
     font-size: 100px;
@@ -286,20 +188,11 @@
   }
 }
 
-
 @media screen and (max-width: 800px) {
-
-
   .books {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(0, 320px));
     grid-template-rows: repeat(auto-fill, 200px);
     grid-row-gap: 20px;
-
-    .book {
-
-    }
   }
-
-
 }

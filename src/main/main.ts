@@ -40,7 +40,8 @@ const createWindow = async () => {
 
 
     if (isDevEnv()) {
-        const rendererPort = process.argv[2];
+        // 注意：因为添加了 --inspect 参数，端口号在 argv[3]
+        const rendererPort = process.argv[3];
         win.loadURL(`http://localhost:${rendererPort}`).catch(err => {
             log.error("load dev server fail!", err)
         });

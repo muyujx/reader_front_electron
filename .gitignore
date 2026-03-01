@@ -12,4 +12,5 @@ build
 /*_local.ps1
 /proxyConfig.js
 /src/common/hostConfig.ts
+prompts
 

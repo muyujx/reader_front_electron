@@ -1,0 +1,54 @@
+# Opencode 配置文件
+# 基于 AGENTS.md 的要求配置
+
+# 项目信息
+project:
+  name: reader
+  type: vue-electron # Vue 3 + Electron 项目
+
+# 代码质量规则
+rules:
+  # 注释要求
+  comments:
+    required: true
+    language: cn # 中文注释
+    methodDoc: true # 方法需要注释
+    fieldDoc: true # 字段需要注释
+  
+  # 代码风格
+  style:
+    indent: 2 # 缩进2格
+    maxMethodLines: 80 # 方法最大行数
+    maxNestDepth: 4 # 最大嵌套深度
+  
+  # 常量管理
+  constants:
+    extract: true # 提取重复字符串为常量
+    reuse: true # 复用已有常量
+
+# 忽略的文件/目录
+ignore:
+  - node_modules
+  - release
+  - build
+  - dist
+  - .git
+  - "*.d.ts"
+  - auto-imports.d.ts
+  - components.d.ts
+
+# 源代码目录
+src:
+  - src/renderer
+  - src/main
+  - src/common
+
+# 使用的技术栈
+techStack:
+  framework: vue3
+  ui: element-plus
+  state: pinia
+  router: vue-router
+  electron: electron
+  build: vite
+  language: typescript

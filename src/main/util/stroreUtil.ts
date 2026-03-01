@@ -23,13 +23,20 @@ async function loadConfig() {
         if (err.code == 'ENOENT') {
             await fs.promises.writeFile(configFile, '{}');
         } else {
-            throw err;
+            log.error("access config file error:", err);
+            finish = true;
+            return;
         }
     }
-    const str = await fs.promises.readFile(configFile, 'utf-8');
-    const json = JSON.parse(str);
-    for (let key in json) {
-        config.set(key, json[key]);
+    
+    try {
+        const str = await fs.promises.readFile(configFile, 'utf-8');
+        const json = JSON.parse(str);
+        for (let key in json) {
+            config.set(key, json[key]);
+        }
+    } catch (err) {
+        log.error("read or parse config file error:", err);
     }
 
     finish = true;

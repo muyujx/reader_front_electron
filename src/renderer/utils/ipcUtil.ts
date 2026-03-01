@@ -10,7 +10,7 @@ export function ipcSend(channel: string): void {
 /**
  * 监听 electron main process 的消息
  */
-export function ipcOn(channel: string, listener: (event: any, args: any[]) => void): void {
+export function ipcOn(channel: string, listener: (...args: any[]) => void): void {
     // @ts-ignore
     window.ipc.on(channel, listener);
 }
@@ -22,5 +22,5 @@ export function ipcOn(channel: string, listener: (event: any, args: any[]) => vo
  */
 export function ipcInvoke(channel: string, ...args: any[]): Promise<any> {
     // @ts-ignore
-    return window.ipc.invoke(channel, args);
+    return window.ipc.invoke(channel, ...args);
 }

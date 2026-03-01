@@ -1,4 +1,4 @@
-import {DEV_MOD, SERVER_DEV_HOST, SERVER_PROD_HOST} from "../../common/hostConfig.ts"
+import {DEV_MOD, SERVER_DEV_HOST, SERVER_PROD_HOST} from "../hostConfig.ts"
 import {ipcInvoke} from "../utils/ipcUtil.ts";
 import ipcChannel from "../../common/ipcChannel.ts";
 import {GetParam, PostParam} from "../../common/request.ts";

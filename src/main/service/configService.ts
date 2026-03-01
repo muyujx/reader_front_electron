@@ -35,9 +35,8 @@ function setStartWinSize(width: number, height: number) {
 /**
  * 修改缓存数据目录
  */
-async function changeRootCacheDir(event: any, arg: any) {
+async function changeRootCacheDir(event: any, newDir: any) {
     let oldDir = await getCacheRootDir();
-    let newDir = arg[0];
     log.log("changeRootCacheDir oldDir = ", oldDir, ", newDir = ", newDir);
 
     if (newDir == null) {

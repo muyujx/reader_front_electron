@@ -1,16 +1,29 @@
 import {onBeforeUnmount, Ref} from "vue";
 import {updateReadingProgressApi} from "../../apis/progress.ts";
+import {updateLocalReadProgress} from "../../apis/bookDownload.ts";
 import {PageItem} from "../../model/pageModel.ts";
 
 
 let lastUpdatePage = 0;
 
+/**
+ * 更新阅读进度
+ * @param bookId 书籍 id
+ * @param page 当前页码
+ * @param readingCost 阅读耗时（秒）
+ * @param isLocal 是否是本地书籍
+ */
 export function updateReadProgress(bookId: number, page: number,
-                                   readingCost: number = 0): Promise<void> {
+                                   readingCost: number = 0, isLocal: boolean = false): Promise<void> {
     if (readingCost == 0 && lastUpdatePage == page) {
         return Promise.resolve();
     }
     lastUpdatePage = page;
+    
+    // 本地书籍使用本地 API，远程书籍使用远程 API
+    if (isLocal) {
+        return updateLocalReadProgress(bookId, page, readingCost);
+    }
     return updateReadingProgressApi(bookId, page, readingCost);
 }
 
@@ -22,10 +35,12 @@ let pageConfirmInterval = -1;
  * @param bookId 书籍 id
  * @param curPageItem 当前显示的页面
  * @param pageConfirm 是否处于 本地 和 远程 进度的选择流程
+ * @param isLocal 是否是本地书籍
  */
 export function recordReadingProgress(bookId: number,
                                       curPageItem: Ref<PageItem>,
-                                      pageConfirm: Ref<boolean>) {
+                                      pageConfirm: Ref<boolean>,
+                                      isLocal: boolean = false) {
 
     onBeforeUnmount(() => {
         console.log("------ pageConfirmInterval onBeforeUnmount -------");
@@ -37,18 +52,19 @@ export function recordReadingProgress(bookId: number,
     if (pageConfirm.value) {
         pageConfirmInterval = setInterval(() => {
             if (!pageConfirm.value) {
-                startRecordProgress(bookId, curPageItem);
+                startRecordProgress(bookId, curPageItem, isLocal);
                 clearInterval(pageConfirmInterval);
             }
         }, 1000);
     } else {
-        startRecordProgress(bookId, curPageItem);
+        startRecordProgress(bookId, curPageItem, isLocal);
     }
 
 }
 
 function startRecordProgress(bookId: number,
-                             curPageItem: Ref<PageItem>) {
+                             curPageItem: Ref<PageItem>,
+                             isLocal: boolean = false) {
     // 开始时间
     let start = Date.now();
 
@@ -84,7 +100,7 @@ function startRecordProgress(bookId: number,
         let seconds = Math.floor(cost / 1000);
         let page = curPageItem.value.page;
 
-        updateReadProgress(bookId, page, seconds)
+        updateReadProgress(bookId, page, seconds, isLocal)
             .then(r => {
                 cost -= seconds * 1000;
             })
@@ -104,5 +120,3 @@ function startRecordProgress(bookId: number,
         updateCostFunc();
     });
 }
-
-

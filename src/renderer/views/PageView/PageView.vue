@@ -129,6 +129,7 @@ import ViewFooterBar from "../../components/ViewFooterBar.vue";
 import {getRemotePage} from "../../apis/userRemotePage";
 import {addHost} from "../../apis/request.ts";
 import {recordReadingProgress, updateReadProgress} from "./pageView.ts";
+import {getDownloadProgress} from "../../apis/bookDownload.ts";
 
 // 是否显示底部时间
 const showClock = ref(false);
@@ -154,6 +155,8 @@ onMounted(() => {
 
 let bookId = 0;
 const totalPage = ref(0);
+// 书籍是否是本地下载的
+const isLocalBook = ref(false);
 
 // 当前显示的页面数据
 const curPageItem = ref<PageItem>(PageCache.BLANK_PAGE_ITEM);
@@ -189,17 +192,26 @@ if (bookIdStr == null || isNaN(parseInt(bookIdStr))) {
 bookId = parseInt(bookIdStr);
 
 // 页面缓存
-const pageCache = new PageCache(bookId);
+let pageCache: PageCache | null = null;
 
-// 获取书籍信息
-getBookInfo(bookId).then((resBookInfo: BookInfo) => {
+// 获取书籍信息并初始化
+getBookInfo(bookId).then(async (resBookInfo: BookInfo) => {
   bookInfo.value = resBookInfo;
   // 设置一下 bookId, 接口没有返回 bookId
   bookInfo.value.bookId = bookId;
   // 将 totalPage
   totalPage.value = resBookInfo.totalPage;
-  // 更新 totalPage
+  // 检查书籍是否已下载（只要在 book 表中存在就使用本地模式）
+  const downloadInfo = await getDownloadProgress(bookId);
+  const useLocal = downloadInfo.exists;
+  isLocalBook.value = useLocal;
+
+  // 创建页面缓存，从本地读取已下载的页面
+  pageCache = new PageCache(bookId, useLocal);
   pageCache.setTotalPage(totalPage.value);
+  
+  // 初始化页面
+  initPage(bookId);
 });
 
 // 快速选择页面中的图片
@@ -291,6 +303,9 @@ const pageConfirm = ref(false);
 const pageConfirmRemote = ref(0);
 const pageConfirmLocal = ref(0);
 
+// 记录阅读进度
+recordReadingProgress(bookId, curPageItem, pageConfirm, isLocalBook.value);
+
 async function initPage(bookId: number) {
   let localPage = getLocalStorageInt(bookId, PageCache.COVER_PAGE);
   // 获取服务端书页进度
@@ -314,7 +329,6 @@ async function initPage(bookId: number) {
   }
 }
 
-initPage(bookId);
 // 记录阅读进度
 recordReadingProgress(bookId, curPageItem, pageConfirm);
 
@@ -352,7 +366,7 @@ function getPageHtml(curPage: number) {
     pageContainer.value.scrollTop = 0;
   }
 
-  pageCache.getPage(curPage).then((pageItem: PageItem | null) => {
+  pageCache?.getPage(curPage).then((pageItem: PageItem | null) => {
     // 多次重复获取不操作直接返回
     if (pageItem == null) {
       return;

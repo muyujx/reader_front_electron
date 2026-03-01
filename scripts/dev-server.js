@@ -49,6 +49,7 @@ async function startElectron() {
     }
 
     electronProcess = ChildProcess.spawn(Electron, [
+        '--inspect=5858',
         Path.join(__dirname, '..', 'build', 'main', 'main.js'),
         rendererPort,
     ]);
