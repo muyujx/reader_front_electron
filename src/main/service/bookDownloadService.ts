@@ -327,6 +327,32 @@ export function initBookDownloadIpc(): void {
         updateBookReadProgress(bookId, readPage, readingCost);
         return { success: true };
     });
+
+    /**
+     * 删除本地书籍
+     * 删除书籍记录、书籍页面记录和图片缓存
+     */
+    ipcMain.handle(ipcChannel.bookDelete, async (event: any, bookId: number) => {
+        console.log(`[Download] Deleting book: ${bookId}`);
+        
+        try {
+            // 确保数据库已初始化
+            await initDb();
+            
+            // 1. 删除数据库中的书籍和页面记录
+            deleteBook(bookId);
+            console.log(`[Download] Deleted book record from database: ${bookId}`);
+            
+            // 2. 删除书籍的图片缓存文件夹
+            await deleteBookImageCache(bookId);
+            console.log(`[Download] Deleted book image cache: ${bookId}`);
+            
+            return { success: true };
+        } catch (error) {
+            console.error(`[Download] Failed to delete book ${bookId}:`, error);
+            return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        }
+    });
 }
 
 // ============================================
@@ -442,6 +468,32 @@ async function cleanOldDownload(bookId: number): Promise<void> {
         console.log(`[Download] Removing old download for book ID: ${bookId}`);
         deleteBookPagesByBookId(bookId);
         deleteBook(bookId);
+    }
+}
+
+/**
+ * 删除书籍的图片缓存
+ * 查找并删除与书籍相关的图片缓存文件夹
+ * @param bookId 书籍 ID
+ */
+async function deleteBookImageCache(bookId: number): Promise<void> {
+    const cacheRootDir = await getCacheRootDir();
+    const resourceDir = Path.join(cacheRootDir, 'resource');
+    
+    if (!fs.existsSync(resourceDir)) {
+        return;
+    }
+    
+    // 读取 resource 目录下的所有文件和文件夹
+    const entries = fs.readdirSync(resourceDir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+        // 检查文件夹名是否包含书籍ID
+        if (entry.isDirectory() && entry.name.includes(String(bookId))) {
+            const dirPath = Path.join(resourceDir, entry.name);
+            console.log(`[Download] Removing image cache directory: ${dirPath}`);
+            fs.rmSync(dirPath, { recursive: true, force: true });
+        }
     }
 }
 

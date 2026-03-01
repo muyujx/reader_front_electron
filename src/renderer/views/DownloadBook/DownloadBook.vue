@@ -34,64 +34,49 @@
                 <div class="detail">
 
                     <div class="delete-download"
-                         @click="deleteBook(book.bookId)"
+                         @click="confirmDelete(book)"
                     >
                         <el-icon>
                             <Delete/>
                         </el-icon>
 
                     </div>
-
                     <p class="name">{{ book.bookName }}</p>
 
-                    <!-- 阅读进度（如果有阅读记录） -->
-                    <div class="item" v-if="book.readPage > 0">
+                    <!-- 阅读进度 -->
+                    <div class="item">
                         <p>阅读进度:</p>
                         <div class="detail_item_content">
-                            <p>{{ book.readPage }} / {{ book.totalPage }} 页</p>
+                            <p>{{ book.readPage == 0 ? 0 : book.readPage }} / {{ book.totalPage }} 页</p>
                             <el-progress
                                 :text-inside="true"
                                 :stroke-width="15"
                                 :format="num => `${num == 0 ? '0' : num.toFixed(2)}%`"
-                                :percentage="book.readPage / book.totalPage * 100"
+                                :percentage="book.readPage == 0 ? 0 : (book.readPage / book.totalPage * 100)"
                             />
                         </div>
                     </div>
 
-                    <div class="item" v-if="book.readPage > 0">
+                    <div class="item">
                         <p>阅读时间:</p>
                         <p>{{ readCost(book.readingCost) }}</p>
                     </div>
-                    <div class="item" v-if="book.readPage > 0">
+                    <div class="item">
                         <p>上次阅读:</p>
                         <p>{{ book.lastRead == 0 ? '未阅读' : getLastRead(book.lastRead) }}</p>
                     </div>
 
-                    <div class="item">
-                        <p>下载状态:</p>
-                        <div class="detail_item_content">
-                            <p>{{ book.downloadedPages }} / {{ book.totalPage }} 页</p>
-                            <el-progress
-                                :text-inside="true"
-                                :stroke-width="15"
-                                :format="num => `${num}%`"
-                                :percentage="book.progress"
-                            />
-                        </div>
+                    <div class="download-complete">
+                        <el-icon color="#67c23a">
+                            <CircleCheck/>
+                        </el-icon>
                     </div>
-
-                    <div class="item">
-                        <p>下载时间:</p>
-                        <p>{{ formatDate(book.createTime) }}</p>
-                    </div>
-
 
                 </div>
 
             </div>
 
         </div>
-
 
         <el-pagination
             v-model:current-page="page"
@@ -112,8 +97,9 @@
 import {addHost} from "../../apis/request.ts";
 import {onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {Download, Delete} from "@element-plus/icons-vue";
+import {Download, Delete, CircleCheck} from "@element-plus/icons-vue";
 import {popErr, popSuccess} from "../../utils/message.ts";
+import { ElMessageBox } from 'element-plus';
 import {loadingStore} from "../../store/loading.ts";
 import hotkeys from "hotkeys-js";
 import windowSizeListener from "../../service/windowSize.ts";
@@ -186,6 +172,28 @@ function jumpToPage(pageIdx: number) {
     }
     page.value = pageIdx;
     getBookList();
+}
+
+/**
+ * 确认删除书籍
+ * @param book 书籍信息
+ */
+function confirmDelete(book: DownloadedBookInfo) {
+    ElMessageBox.confirm(
+        `确定要删除书籍 "${book.bookName}" 吗？删除后将无法恢复。`,
+        '确认删除',
+        {
+            confirmButtonText: '确定删除',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    )
+        .then(() => {
+            deleteBook(book.bookId);
+        })
+        .catch(() => {
+            // 用户取消删除，不做任何操作
+        });
 }
 
 function deleteBook(bookId: number) {
