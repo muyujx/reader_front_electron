@@ -5,6 +5,7 @@ import {initStoreService} from "./storeService";
 import {initConfigService} from "./configService";
 import {initRequestIpc} from "./request";
 import {initBookDownloadIpc} from "./bookDownloadService";
+import {initCppAddonIpc} from "./cppAddonService";
 
 
 export function initIpcEvent(window: BrowserWindow) {
@@ -20,6 +21,8 @@ export function initIpcEvent(window: BrowserWindow) {
     initRequestIpc();
 
     initBookDownloadIpc();
+
+    initCppAddonIpc();
     
 }
 

@@ -36,5 +36,8 @@ export default {
     bookGetListByPage: 'book:get-list-by-page',
 
     // 阅读进度
-    bookUpdateReadProgress: 'book:update-read-progress'
+    bookUpdateReadProgress: 'book:update-read-progress',
+
+    // C++ addon
+    cppGetObject: 'cpp:get-object'
 }

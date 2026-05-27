@@ -7,9 +7,10 @@
   "description": "reader",
   "scripts": {
     "pre-build": "node scripts/prepare.js",
-    "dev": "npm run pre-build && node scripts/dev-server.js",
-    "build": "npm run pre-build && node scripts/build.js && electron-builder ",
-    "build:win": "npm run pre-build && node scripts/build.js && electron-builder --win",
+    "build:cc": "cd src/cc && cmake-js compile --runtime electron --runtime-version 38.8.4",
+    "dev": "npm run build:cc && npm run pre-build && node scripts/dev-server.js",
+    "build": "npm run build:cc && npm run pre-build && node scripts/build.js && electron-builder ",
+    "build:win": "npm run build:cc && npm run pre-build && node scripts/build.js && electron-builder --win",
     "build:dev:local": "npm run build:win && powershell -ExecutionPolicy Bypass -File deploy_local.ps1"
   },
   "dependencies": {
@@ -29,12 +30,17 @@
     "vue-router": "4"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.0.4",
     "@types/set-cookie-parser": "^2.4.10",
     "@vitejs/plugin-vue": "^5.2.4",
     "chalk": "^5.6.2",
     "chokidar": "^4.0.3",
+    "cmake-js": "^7.3.0",
     "electron": "^38.4.0",
     "electron-builder": "^26.0.12",
+    "electron-rebuild": "^3.2.9",
+    "node-addon-api": "^8.8.0",
+    "node-gyp": "^12.3.0",
     "typescript": "^5.9.3",
     "unplugin-auto-import": "^20.2.0",
     "unplugin-vue-components": "^30.0.0",

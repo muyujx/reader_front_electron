@@ -14,3 +14,8 @@ build
 /src/common/hostConfig.ts
 prompts
 
+# C++ addon build
+src/cc/build
+src/cc/cmake-build-*
+doc
+

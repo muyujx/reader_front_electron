@@ -23,10 +23,23 @@ import TitleBar from "./components/window/TitleBar.vue";
 import hotkeys from 'hotkeys-js';
 import {useRouter} from "vue-router";
 import Loading from "./components/Loading.vue";
+import {onMounted} from "vue";
+import {ipcInvoke} from "./utils/ipcUtil";
+import ipcChannel from "../common/ipcChannel";
 
 const theme = themeStore();
 document.body.classList.add(theme.current);
 const router = useRouter();
+
+// 测试 C++ addon 调用
+onMounted(async () => {
+    try {
+        const result = await ipcInvoke(ipcChannel.cppGetObject);
+        console.log('C++ addon result:', result);
+    } catch (err) {
+        console.error('C++ addon call failed:', err);
+    }
+});
 
 
 hotkeys('ctrl+s', (e) => e.preventDefault());
