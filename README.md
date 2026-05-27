@@ -11,9 +11,11 @@
 #### 阅读
 ![](./docs/page.png)
 
+#### 历史阅读记录
+![](./docs/history.png)
+
 #### 配置
 ![](./docs/config.png)
-
 
 
 
